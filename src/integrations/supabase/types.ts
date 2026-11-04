@@ -14,13 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      jobs: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          expires_at: string
+          id: string
+          ip_hash: string
+          result: Json | null
+          stages: Json
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          expires_at: string
+          id?: string
+          ip_hash: string
+          result?: Json | null
+          stages?: Json
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          expires_at?: string
+          id?: string
+          ip_hash?: string
+          result?: Json | null
+          stages?: Json
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          window_start: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          checks: Json
+          classification: string
+          coverage: number
+          created_at: string
+          delete_token_hash: string
+          expires_at: string
+          id: string
+          input_display: string
+          input_kind: string
+          result: Json
+          score: number
+          signals: Json
+          summary: string
+        }
+        Insert: {
+          checks?: Json
+          classification: string
+          coverage: number
+          created_at?: string
+          delete_token_hash: string
+          expires_at: string
+          id?: string
+          input_display: string
+          input_kind: string
+          result: Json
+          score: number
+          signals?: Json
+          summary?: string
+        }
+        Update: {
+          checks?: Json
+          classification?: string
+          coverage?: number
+          created_at?: string
+          delete_token_hash?: string
+          expires_at?: string
+          id?: string
+          input_display?: string
+          input_kind?: string
+          result?: Json
+          score?: number
+          signals?: Json
+          summary?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_report: {
+        Args: { report_id: string; token: string }
+        Returns: boolean
+      }
+      get_job: { Args: { job_id: string }; Returns: Json }
+      get_report: { Args: { report_id: string }; Returns: Json }
+      purge_expired: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
