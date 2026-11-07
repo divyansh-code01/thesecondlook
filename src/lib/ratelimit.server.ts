@@ -57,23 +57,10 @@ async function checkAndCount(
     };
   }
 
-  const { data: updated, error } = await admin
-    .from("rate_limits")
-    .upsert(
-      { key, window_start: start, count: 1 },
-      { onConflict: "key", ignoreDuplicates: false },
-    )
-    .select("count")
-    .single();
-  void updated;
-  void error;
-
-  // Increment (upsert above resets a fresh window; increment within the same window).
-  if (row && row.window_start === start && row.count > 0) {
-    await admin
-      .from("rate_limits")
-      .update({ count: row.count + 1 })
-      .eq("key", key);
+  if (row && row.window_start === start) {
+    await admin.from("rate_limits").update({ count: row.count + 1 }).eq("key", key);
+  } else {
+    await admin.from("rate_limits").upsert({ key, window_start: start, count: 1 }, { onConflict: "key" });
   }
 
   return { exceeded: false };
