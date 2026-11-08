@@ -1,0 +1,2 @@
+alter table public.jobs add column input jsonb not null default '{}'::jsonb;
+comment on column public.jobs.input is 'Private submitted input (url or upload path). Never returned by get_job; purged with the job.';

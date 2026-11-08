@@ -113,7 +113,7 @@ export const createJob = createServerFn({ method: "POST" })
         stages,
         expires_at: expiresAt,
         ip_hash: ip,
-        ...(data.kind === "url" ? {} : {}),
+        input: data.kind === "url" ? { url: normalizedUrl } : { uploadPath: data.uploadPath },
       })
       .select("id")
       .single();
@@ -148,7 +148,7 @@ export const runAnalysis = createServerFn({ method: "POST" })
 
     const { data: job, error: jobError } = await admin
       .from("jobs")
-      .select("id, type, status, expires_at")
+      .select("id, type, status, expires_at, input")
       .eq("id", data.jobId)
       .single();
 
@@ -189,12 +189,13 @@ export const runAnalysis = createServerFn({ method: "POST" })
     }
 
     try {
+      const input = (job.input ?? {}) as { url?: string; uploadPath?: string };
       if (job.type === "url") {
         const { runUrlPipeline } = await import("./pipeline-url.server");
-        await runUrlPipeline(admin, data.jobId);
+        await runUrlPipeline(admin, data.jobId, input.url ?? "");
       } else {
         const { runScreenshotPipeline } = await import("./pipeline-screenshot.server");
-        await runScreenshotPipeline(admin, data.jobId);
+        await runScreenshotPipeline(admin, data.jobId, input.uploadPath ?? "");
       }
     } catch (e) {
       await admin

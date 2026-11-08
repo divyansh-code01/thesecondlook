@@ -20,6 +20,7 @@ export type Database = {
           error_code: string | null
           expires_at: string
           id: string
+          input: Json
           ip_hash: string
           result: Json | null
           stages: Json
@@ -32,6 +33,7 @@ export type Database = {
           error_code?: string | null
           expires_at: string
           id?: string
+          input?: Json
           ip_hash: string
           result?: Json | null
           stages?: Json
@@ -44,6 +46,7 @@ export type Database = {
           error_code?: string | null
           expires_at?: string
           id?: string
+          input?: Json
           ip_hash?: string
           result?: Json | null
           stages?: Json
