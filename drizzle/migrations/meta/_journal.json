@@ -8,6 +8,13 @@
       "when": 1793799781716,
       "tag": "0000_second_look_core_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794113290660,
+      "tag": "0001_jobs_input_column",
+      "breakpoints": true
     }
   ]
 }
