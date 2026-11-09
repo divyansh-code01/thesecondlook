@@ -36,9 +36,10 @@ function ReportPage() {
     if (freshToken) localStorage.setItem(`sl-delete-${id}`, freshToken);
     setToken(localStorage.getItem(`sl-delete-${id}`));
     void get({ data: { id } }).then((r) => {
-      if ("report" in r && r.report) {
-        setReport(r.report.result as ReportPayload);
-        setExpires(String(r.report.expires_at ?? ""));
+      if ("json" in r && r.json) {
+        const rep = JSON.parse(r.json) as { result: ReportPayload; expires_at: string };
+        setReport(rep.result);
+        setExpires(rep.expires_at);
       } else setReport(null);
     });
   }, [id, freshToken, get]);

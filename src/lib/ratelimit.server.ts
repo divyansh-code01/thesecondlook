@@ -1,4 +1,4 @@
-import { getRequestHeader } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 
 /**
  * Second Look® — rate limiting (spec §8).

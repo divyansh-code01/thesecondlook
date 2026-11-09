@@ -9,7 +9,7 @@ export function DarkCta() {
         <br />
         IT'S REAL.
       </h2>
-      <Link to="/#submit" className="btn-pill-light mt-10">
+      <Link to="/" hash="submit" className="btn-pill-light mt-10">
         Check something now
       </Link>
       <p className="mx-auto mt-8 max-w-md text-[13px] leading-relaxed text-[#9a9a9a]">

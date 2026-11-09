@@ -16,11 +16,11 @@ export const createUploadTarget = createServerFn({ method: "POST" })
     const { getSupabaseAdmin } = await import("./supabase.server");
     const admin = getSupabaseAdmin();
     const path = `${crypto.randomUUID()}/${Date.now().toString(36)}.png`;
-    const { data, error } = await admin.storage.from("uploads").createSignedUploadUrl(path, 600);
+    const { data, error } = await admin.storage.from("uploads").createSignedUploadUrl(path);
     if (error || !data) {
       return { error: "upload_target_failed" as const };
     }
-    return { path: data.path, token: data.token, signedUrl: data.signed_url };
+    return { path: data.path, token: data.token, signedUrl: data.signedUrl };
   });
 
 const createJobInput = z
@@ -37,8 +37,7 @@ const createJobInput = z
 
 export type CreateJobResult =
   | { jobId: string }
-  | { error: string; message: string; retryAfterSeconds?: number }
-  | { demoJobId: string };
+  | { error: string; message: string; retryAfterSeconds?: number };
 
 export const createJob = createServerFn({ method: "POST" })
   .inputValidator((input) => createJobInput.parse(input))
@@ -135,7 +134,7 @@ export const getJobStatus = createServerFn({ method: "POST" })
     if (error) {
       return { error: "backend_failed" as const };
     }
-    return { job: (job as unknown) as Record<string, unknown> | null };
+    return { json: job ? JSON.stringify(job) : null };
   });
 
 const runAnalysisInput = z.object({ jobId: z.string().uuid() }).strict();

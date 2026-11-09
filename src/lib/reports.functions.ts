@@ -44,7 +44,7 @@ export const getReport = createServerFn({ method: "POST" })
     const { getSupabasePublishable } = await import("./supabase.server");
     const { data: r, error } = await getSupabasePublishable().rpc("get_report", { report_id: data.id });
     if (error) return { error: "backend" as const };
-    return { report: (r ?? null) as Record<string, unknown> | null };
+    return { json: r ? JSON.stringify(r) : null };
   });
 
 export const deleteReport = createServerFn({ method: "POST" })
