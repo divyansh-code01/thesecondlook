@@ -12,6 +12,7 @@
 ## Second Look architecture
 - Scores are computed only in `src/shared/scoring.ts` from typed signals; weights live only in `src/shared/signals.config.ts`. Why: scores must be deterministic and reproducible from the report.
 - AI is used only for OCR and enum-constrained message signals (`src/lib/ai.server.ts`); quotes are validated as substrings in code. Why: the model must never set the score or be steerable by content.
+- Deterministic message rules (`src/shared/message-rules.ts`, source "rules") run before AI; AI signals with the same id are dropped, never replacing rules. Why: scoring must work with no AI or keys.
 - Every outbound fetch from user input goes through `resolveAndGuard` (DoH + `src/shared/ip-guard.ts`), re-checked on each redirect hop. Why: SSRF defence.
 - Jobs/reports tables have no client policies; reads go through security-definer RPCs via server functions. Why: anonymous app with no direct table access.
 - Pipeline "edge functions" from the spec are TanStack server functions in `src/lib/*.functions.ts`. Why: platform uses server functions, not edge functions.
