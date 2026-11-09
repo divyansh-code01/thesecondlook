@@ -81,6 +81,8 @@ export function urlHeuristics(rawUrl: string): Signal[] {
       const bl = b.domain.split(".")[0];
       if (bl.length < 3) return false;
       if (label === bl) return true; // same name, different TLD
+      const tokens = label.split(/[-_]/).filter((t) => t.length >= 4);
+      if (bl.length >= 5 && tokens.some((t) => t === bl || levenshtein(t, bl) <= 1)) return true;
       if (bl.length >= 5 && label.includes(bl)) return true;
       return bl.length >= 5 && levenshtein(label, bl) <= (bl.length >= 8 ? 2 : 1);
     });
