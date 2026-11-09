@@ -16,10 +16,11 @@ export async function createStageTracker(admin: Admin, jobId: string) {
       .eq("id", jobId);
   }
 
-  async function set(id: string, status: StageStatus) {
+  async function set(id: string, status: StageStatus, note?: string) {
     const s = stages.find((x) => x.id === id);
     if (!s) return;
     s.status = status;
+    if (note) s.note = note;
     const now = new Date().toISOString();
     if (status === "running") s.started_at = now;
     else {

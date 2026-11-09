@@ -170,7 +170,7 @@ async function doh(name: string, type: string): Promise<DohAnswer[] | null> {
 }
 
 /** Resolve and verify every A/AAAA is public. */
-export async function resolveAndGuard(host: string): Promise<{ ok: boolean; reason?: string; ips: string[]; dnsFailed?: boolean }> {
+export async function resolveAndGuard(host: string): Promise<{ ok: boolean; reason?: string; ips: string[]; dnsFailed?: boolean; nxdomain?: boolean }> {
   const c = classifyHost(host);
   if (c.kind === "blocked") return { ok: false, reason: c.reason, ips: [] };
   const v4 = expandIpV4Literal(host);
@@ -184,7 +184,7 @@ export async function resolveAndGuard(host: string): Promise<{ ok: boolean; reas
       if (classifyHost(ip).kind === "blocked" || isPrivateV6Safe(ip)) return { ok: false, reason: "resolves_to_private_ip", ips };
     } else if (isPrivateV4(ip)) return { ok: false, reason: "resolves_to_private_ip", ips };
   }
-  return { ok: true, ips };
+  return { ok: true, ips, nxdomain: ips.length === 0 };
 }
 
 function isPrivateV6Safe(ip: string): boolean {
@@ -259,7 +259,10 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
   // Redirects
   await stage("redirects", "running");
   let finalUrl = normalizedUrl;
-  if (guard.ok && (!u.port || u.port === "80" || u.port === "443")) {
+  if (guard.nxdomain) {
+    checks.push({ name: "Safe redirect following", status: "completed", source: "heuristic", note: "Domain does not resolve" });
+    await stage("redirects", "done");
+  } else if (guard.ok && (!u.port || u.port === "80" || u.port === "443")) {
     const r = await followRedirects(normalizedUrl);
     technical.redirectChain = r.hops;
     finalUrl = r.finalUrl;
@@ -272,7 +275,7 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
         }),
       );
     } else {
-      checks.push({ name: "Safe redirect following", status: r.failed ? "unavailable" : "completed", source: "heuristic" });
+      checks.push({ name: "Safe redirect following", status: r.failed ? "unavailable" : "completed", source: "heuristic", note: r.failed ? "The site did not respond within 4 seconds" : undefined });
     }
     if (r.hops.length > 3) signals.push(makeSignal("redirect_chain_long", { found: `The link passes through ${r.hops.length} redirects.` }));
     const domains = new Set(r.hops.map((h) => registrableDomain(new URL(h.to).hostname)));
@@ -344,7 +347,7 @@ async function followRedirects(start: string): Promise<{ hops: RedirectHop[]; fi
 async function domainIntel(
   reg: string,
   host: string,
-  guard: { ok: boolean; ips: string[]; dnsFailed?: boolean },
+  guard: { ok: boolean; ips: string[]; dnsFailed?: boolean; nxdomain?: boolean },
   emailClaim: boolean,
 ) {
   const checks: Check[] = [];
@@ -362,43 +365,49 @@ async function domainIntel(
   const types = ["A", "AAAA", "MX", "NS", "TXT"] as const;
   const results = await Promise.all(types.map((t) => doh(t === "MX" || t === "NS" || t === "TXT" ? reg : host, t)));
   if (results.every((r) => r === null)) {
-    checks.push({ name: "DNS records", status: "unavailable", source: "dns" });
+    checks.push({ name: "DNS records", status: "unavailable", source: "dns", note: "DNS-over-HTTPS lookup did not respond" });
   } else {
     const records = results.flatMap((r, i) => (r ?? []).map((a) => ({ type: types[i], value: a.data.slice(0, 200) })));
     dns = { records: records.slice(0, 30), source: "Cloudflare DNS-over-HTTPS" };
-    checks.push({ name: "DNS records", status: "completed", source: "dns" });
+    checks.push({ name: "DNS records", status: "completed", source: "dns", note: guard.nxdomain ? "Domain does not resolve" : undefined });
     if (guard.ips.length === 0) signals.push(makeSignal("domain_unresolvable", { found: `${host} returned no address records.` }));
     const mx = results[2] ?? [];
     if (emailClaim && mx.length === 0) signals.push(makeSignal("dns_no_mx_for_email_claim", { found: `${reg} publishes no mail servers.` }));
   }
 
   // RDAP
-  try {
-    const res = await fetchWithTimeout(`https://rdap.org/domain/${encodeURIComponent(reg)}`, { headers: { accept: "application/rdap+json" } }, 5000);
-    if (!res.ok) throw new Error(String(res.status));
-    const j = (await res.json()) as {
-      events?: { eventAction: string; eventDate: string }[];
-      entities?: { roles?: string[]; vcardArray?: unknown[] }[];
-    };
+  const r = await lookupRdap(reg);
+  if (r.kind === "unavailable") {
+    rdap = { status: "unavailable" };
+    checks.push({ name: "Domain registration (RDAP)", status: "unavailable", source: "rdap", note: r.reason });
+  } else if (r.kind === "none") {
+    rdap = { status: "no record" };
+    checks.push({ name: "Domain registration (RDAP)", status: "completed", source: "rdap", note: "No registration record found" });
+  } else {
+    const j = r.data;
     const created = j.events?.find((e) => e.eventAction === "registration")?.eventDate;
     const registrarEnt = j.entities?.find((e) => e.roles?.includes("registrar"));
     const vcard = registrarEnt?.vcardArray?.[1] as unknown[] | undefined;
     const fn = (vcard?.find((x) => Array.isArray(x) && x[0] === "fn") as unknown[] | undefined)?.[3] as string | undefined;
     const ageDays = created ? Math.floor((Date.now() - new Date(created).getTime()) / 86400000) : null;
     rdap = { registrar: fn, created, ageDays, status: "ok" };
-    checks.push({ name: "Domain registration (RDAP)", status: "completed", source: "rdap" });
+    checks.push({ name: "Domain registration (RDAP)", status: "completed", source: "rdap", note: created ? undefined : "No registration date published" });
     if (ageDays !== null && ageDays < 30) {
       signals.push(makeSignal("domain_very_new", { found: `${reg} was registered ${ageDays} days ago (${created?.slice(0, 10)}).`, status: "info" }));
     } else if (ageDays !== null && ageDays < 90) {
       signals.push(makeSignal("domain_new", { found: `${reg} was registered ${ageDays} days ago (${created?.slice(0, 10)}).`, status: "info" }));
     }
     const raw = JSON.stringify(j).toLowerCase();
-    if (raw.includes("redacted for privacy") || raw.includes("privacy") && raw.includes("proxy")) {
+    if (raw.includes("redacted for privacy") || (raw.includes("privacy") && raw.includes("proxy"))) {
       signals.push(makeSignal("registrar_privacy_hidden", { found: "Registrant details are redacted.", status: "info" }));
     }
-  } catch {
-    rdap = { status: "unavailable" };
-    checks.push({ name: "Domain registration (RDAP)", status: "unavailable", source: "rdap" });
+  }
+
+  // TLS: not applicable to a domain that does not resolve
+  if (guard.nxdomain) {
+    tls = { status: "not applicable" };
+    checks.push({ name: "TLS certificate history", status: "completed", source: "crtsh", note: "Domain does not resolve" });
+    return { checks, signals, dns, rdap, tls };
   }
 
   // TLS via Certificate Transparency
@@ -419,7 +428,7 @@ async function domainIntel(
     checks.push({ name: "TLS certificate history", status: "completed", source: "crtsh", note: "HTTPS does not indicate that a site is trustworthy." });
   } catch {
     tls = { status: "unavailable" };
-    checks.push({ name: "TLS certificate history", status: "unavailable", source: "crtsh" });
+    checks.push({ name: "TLS certificate history", status: "unavailable", source: "crtsh", note: "Certificate log (crt.sh) did not respond in time" });
   }
 
   return { checks, signals, dns, rdap, tls };
@@ -474,7 +483,7 @@ async function threatIntel(url: string, host: string) {
       } else verdicts.push({ name: "Google Safe Browsing", verdict: "not listed", source: "safe_browsing" });
       checks.push({ name: "Google Safe Browsing", status: "completed", source: "safe_browsing" });
     } catch {
-      checks.push({ name: "Google Safe Browsing", status: "unavailable", source: "safe_browsing" });
+      checks.push({ name: "Google Safe Browsing", status: "unavailable", source: "safe_browsing", note: "The service did not respond" });
       verdicts.push({ name: "Google Safe Browsing", verdict: "unavailable", source: "safe_browsing" });
     }
   }
@@ -499,7 +508,7 @@ async function threatIntel(url: string, host: string) {
       } else verdicts.push({ name: "URLhaus", verdict: "not listed", source: "urlhaus" });
       checks.push({ name: "URLhaus", status: "completed", source: "urlhaus" });
     } catch {
-      checks.push({ name: "URLhaus", status: "unavailable", source: "urlhaus" });
+      checks.push({ name: "URLhaus", status: "unavailable", source: "urlhaus", note: "The service did not respond" });
       verdicts.push({ name: "URLhaus", verdict: "unavailable", source: "urlhaus" });
     }
   }
@@ -521,7 +530,7 @@ async function threatIntel(url: string, host: string) {
       } else verdicts.push({ name: "PhishTank", verdict: "not listed", source: "phishtank" });
       checks.push({ name: "PhishTank", status: "completed", source: "phishtank" });
     } catch {
-      checks.push({ name: "PhishTank", status: "unavailable", source: "phishtank" });
+      checks.push({ name: "PhishTank", status: "unavailable", source: "phishtank", note: "The service did not respond" });
     }
   }
 
@@ -539,9 +548,58 @@ async function threatIntel(url: string, host: string) {
       } else verdicts.push({ name: "VirusTotal", verdict: mal === 1 ? "1 vendor flagged" : "not flagged", source: "virustotal" });
       checks.push({ name: "VirusTotal", status: "completed", source: "virustotal" });
     } catch {
-      checks.push({ name: "VirusTotal", status: "unavailable", source: "virustotal" });
+      checks.push({ name: "VirusTotal", status: "unavailable", source: "virustotal", note: "The service did not respond" });
     }
   }
 
   return { checks, signals, verdicts };
+}
+
+type RdapJson = {
+  events?: { eventAction: string; eventDate: string }[];
+  entities?: { roles?: string[]; vcardArray?: unknown[] }[];
+};
+
+let ianaCache: { at: number; services: [string[], string[]][] } | null = null;
+
+async function rdapBaseFor(tld: string): Promise<string | null> {
+  try {
+    if (!ianaCache || Date.now() - ianaCache.at > 6 * 3600_000) {
+      const res = await fetchWithTimeout("https://data.iana.org/rdap/dns.json", {}, 8000);
+      if (!res.ok) return null;
+      const j = (await res.json()) as { services: [string[], string[]][] };
+      ianaCache = { at: Date.now(), services: j.services };
+    }
+    const svc = ianaCache.services.find(([tlds]) => tlds.includes(tld));
+    const base = svc?.[1].find((u) => u.startsWith("https://")) ?? svc?.[1][0];
+    return base ? (base.endsWith("/") ? base : `${base}/`) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** RDAP via the IANA bootstrap server for the TLD, falling back to rdap.org. */
+export async function lookupRdap(
+  reg: string,
+): Promise<{ kind: "ok"; data: RdapJson } | { kind: "none" } | { kind: "unavailable"; reason: string }> {
+  const tld = reg.split(".").pop() ?? "";
+  const headers = { accept: "application/rdap+json, application/json" };
+  const base = await rdapBaseFor(tld);
+  if (base) {
+    try {
+      const res = await fetchWithTimeout(`${base}domain/${encodeURIComponent(reg)}`, { headers, redirect: "follow" }, 8000);
+      if (res.status === 404) return { kind: "none" };
+      if (res.ok) return { kind: "ok", data: (await res.json()) as RdapJson };
+    } catch {
+      /* fall back */
+    }
+  }
+  try {
+    const res = await fetchWithTimeout(`https://rdap.org/domain/${encodeURIComponent(reg)}`, { headers, redirect: "follow" }, 8000);
+    if (res.status === 404) return { kind: "none" };
+    if (!res.ok) return { kind: "unavailable", reason: `Registration lookup returned an error (${res.status})` };
+    return { kind: "ok", data: (await res.json()) as RdapJson };
+  } catch {
+    return { kind: "unavailable", reason: "Registration lookup did not respond in time" };
+  }
 }
