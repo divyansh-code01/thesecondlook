@@ -68,6 +68,13 @@ export const SIGNALS: Record<string, SignalMeta> = {
     title: "Domain ending is frequently misused",
     why: "Some domain endings are cheap and disproportionately appear in scam links. This is a weak signal on its own.",
   },
+  deceptive_hostname_keywords: {
+    category: "url",
+    weight: 12,
+    source: "heuristic",
+    title: "Hostname combines trust words with hyphens",
+    why: "Hostnames like 'secure-login-update' string together reassuring words to look official. Real organisations rarely build their main address this way.",
+  },
   url_shortener: {
     category: "url",
     weight: 10,
