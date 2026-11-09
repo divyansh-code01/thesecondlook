@@ -36,6 +36,7 @@ export type Stage = {
   status: StageStatus;
   started_at?: string;
   ended_at?: string;
+  note?: string;
 };
 
 export type RedirectHop = {

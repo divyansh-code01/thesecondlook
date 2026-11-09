@@ -94,7 +94,7 @@ export const BRAND_DOMAINS: { brand: string; domain: string }[] = [
 export const SUSPICIOUS_TLDS = new Set([
   "zip", "top", "xyz", "click", "work", "country", "gq", "tk", "ml", "cf", "buzz",
   "cam", "rest", "monster", "sbs", "quest", "cfd", "lol", "support", "mom", "fit",
-  "now", "rodeo", "autos", "boats", "beauty", "review", "loan", "date", "racing",
+  "now", "rodeo", "icu", "live", "autos", "boats", "beauty", "review", "loan", "date", "racing",
 ]);
 
 export const CREDENTIAL_KEYWORDS = [
@@ -103,6 +103,11 @@ export const CREDENTIAL_KEYWORDS = [
   "passwd", "billing", "invoice", "payment", "recovery", "unlock", "suspend",
   "suspended", "limited", "locked", "alert", "urgent", "authenticate",
   "authorization", "webscr", "kyc", "2fa", "otp", "support-case", "refund",
+];
+
+/** Trust words that, combined with hyphens in a hostname, are a phishing pattern. */
+export const HOSTNAME_TRUST_WORDS = [
+  "secure", "verify", "login", "update", "account", "online", "official", "support",
 ];
 
 export const URL_SHORTENERS = new Set([

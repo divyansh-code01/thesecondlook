@@ -6,6 +6,7 @@ import type { Check, Signal } from "@/shared/types";
 import { defangUrl } from "@/shared/types";
 import { AiUnavailableError, extractMessageSignals, runOcr, type OcrResult } from "./ai.server";
 import { buildReport } from "./report-build";
+import { govLinkMismatch, runMessageRules } from "@/shared/message-rules";
 import { createStageTracker, failJob, finishJob } from "./stages.server";
 import { analyzeUrl, makeSignal } from "./url-analysis.server";
 
@@ -48,7 +49,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
       checks.push({ name: "Text extraction (OCR)", status: "completed", source: "ai" });
     } catch (e) {
       const code = e instanceof AiUnavailableError ? e.code : "ocr_failed";
-      await tracker.set("ocr", "unavailable");
+      await tracker.set("ocr", "unavailable", "Text reading service did not respond");
       await failJob(admin, jobId, code === "http_429" ? "rate_limited_ai" : code === "http_402" ? "ai_credits" : "ai_unavailable");
       return;
     }
@@ -90,6 +91,10 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
       }),
     );
   }
+  // Deterministic message rules run first; AI can only add to them.
+  const ruleSignals = runMessageRules(text, ocr.sender_label);
+  signals.push(...ruleSignals, ...govLinkMismatch(text, refs.urls));
+  checks.push({ name: "Message rule checks", status: "completed", source: "rules" });
   await tracker.set("extract", "done");
 
   // Links
@@ -103,7 +108,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
     const results = await Promise.all(urls.map((u) => analyzeUrl(u).catch(() => null)));
     results.forEach((r, i) => {
       if (!r) {
-        checks.push({ name: `Link check: ${defangUrl(urls[i])}`, status: "unavailable", source: "heuristic" });
+        checks.push({ name: `Link check: ${defangUrl(urls[i])}`, status: "unavailable", source: "heuristic", note: "The link checks failed to run" });
         return;
       }
       if (r.blocked) {
@@ -112,7 +117,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
       }
       for (const s of r.signals) signals.push({ ...s, found: `${r.defangedUrl}: ${s.found}` });
       const tiOk = r.checks.filter((c) => c.status === "completed").length;
-      checks.push({ name: `Link check: ${r.defangedUrl}`, status: tiOk ? "completed" : "unavailable", source: "heuristic" });
+      checks.push({ name: `Link check: ${r.defangedUrl}`, status: tiOk ? "completed" : "unavailable", source: "heuristic", note: tiOk ? undefined : "None of the link checks could complete" });
     });
     await tracker.set("links", "done");
   }
@@ -121,7 +126,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
   await tracker.set("message", "running");
   try {
     const ai = await extractMessageSignals(text, ocr.sender_label);
-    const seen = new Set<string>();
+    const seen = new Set<string>(signals.filter((x) => x.source === "rules").map((x) => x.id));
     for (const s of ai.signals) {
       const quote = s.quote.slice(0, 160);
       if (!quote || !text.includes(quote) || seen.has(s.id) || !SIGNALS[s.id]) continue;
@@ -143,8 +148,8 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
     checks.push({ name: "Message wording analysis", status: "completed", source: "ai" });
     await tracker.set("message", "done");
   } catch {
-    checks.push({ name: "Message wording analysis", status: "unavailable", source: "ai" });
-    await tracker.set("message", "unavailable");
+    checks.push({ name: "Message wording analysis", status: "unavailable", source: "ai", note: "The AI wording check did not respond; rule checks still ran" });
+    await tracker.set("message", "unavailable", "AI wording check did not respond");
   }
 
   await tracker.set("risk", "running");

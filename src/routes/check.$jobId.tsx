@@ -129,7 +129,10 @@ function CheckPage() {
               <li key={s.id} className="flex items-center gap-4 border-t border-line py-4 text-[15px]">
                 <span aria-hidden className={`w-4 font-mono ${s.status === "running" ? "animate-pulse" : ""}`}>{GLYPH[s.status]}</span>
                 <span className={s.status === "pending" ? "text-grey-soft" : ""}>{s.label}</span>
-                <span className="ml-auto text-[12px] uppercase text-grey-soft">{s.status}{secs ? ` · ${secs}s` : ""}</span>
+                <span className="ml-auto text-right text-[12px] text-grey-soft">
+                  <span className="uppercase">{s.status}{secs ? ` · ${secs}s` : ""}</span>
+                  {s.status === "unavailable" && <span className="block">{s.note ?? "This check could not run"}</span>}
+                </span>
               </li>
             );
           })}
