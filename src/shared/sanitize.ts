@@ -27,7 +27,24 @@ export type ExtractedRefs = {
 };
 
 /** Regex-based extraction — done in code, never by the LLM (spec §7). */
-export function extractRefs(text: string): ExtractedRefs {
+/**
+ * OCR often splits a link across lines. Rejoin a line ending in "-", "/", "." or "?"
+ * with the next line when the next line starts without a space and the joined
+ * text forms a hostname with a TLD.
+ */
+export function rejoinSplitLinks(text: string): string {
+  return text.replace(/(https?:\/\/[^\s<>"')\]]*[-/.?])\r?\n(?=\S)([^\s<>"')\]]+)/gi, (m, a: string, b: string) => {
+    try {
+      const host = new URL(a + b).hostname;
+      return /\.[a-z]{2,63}$/i.test(host) && !/-$/.test(host) ? a + b : m;
+    } catch {
+      return m;
+    }
+  });
+}
+
+export function extractRefs(rawText: string): ExtractedRefs {
+  const text = rejoinSplitLinks(rawText);
   const urls = Array.from(new Set(text.match(URL_RE) ?? [])).map((u) => u.replace(/[.,;]+$/, ""));
   const emails = Array.from(new Set(text.match(EMAIL_RE) ?? []));
   // Phone-like runs that are not part of a URL or email

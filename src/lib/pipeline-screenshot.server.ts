@@ -8,7 +8,7 @@ import { AiUnavailableError, extractMessageSignals, runOcr, type OcrResult } fro
 import { buildReport } from "./report-build";
 import { govLinkMismatch, runMessageRules } from "@/shared/message-rules";
 import { createStageTracker, failJob, finishJob } from "./stages.server";
-import { analyzeUrl, makeSignal } from "./url-analysis.server";
+import { analyzeUrl, isMalformedHost, makeSignal, urlHeuristics } from "./url-analysis.server";
 
 const CONF = { low: 0.4, medium: 0.7, high: 1 } as const;
 
@@ -99,8 +99,27 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
 
   // Links
   await tracker.set("links", "running");
-  const urls = refs.urls.slice(0, 5);
   const notes: string[] = [];
+  const candidates = refs.urls.slice(0, 5);
+  const urls: string[] = [];
+  for (const raw of candidates) {
+    let host = "";
+    try {
+      host = new URL(raw).hostname;
+    } catch {
+      /* unparseable */
+    }
+    if (!host || isMalformedHost(host)) {
+      notes.push(`${defangUrl(raw)}: Link looks incomplete or malformed and was not checked.`);
+      try {
+        for (const s of urlHeuristics(raw)) signals.push({ ...s, found: `${defangUrl(raw)}: ${s.found}` });
+      } catch {
+        /* not parseable at all */
+      }
+      continue;
+    }
+    urls.push(raw);
+  }
   if (refs.urls.length > 5) notes.push(`${refs.urls.length - 5} more links were found but not checked.`);
   if (urls.length === 0) {
     await tracker.set("links", "skipped");
@@ -112,7 +131,11 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
         return;
       }
       if (r.blocked) {
-        notes.push(`${r.defangedUrl} points to a private network and was not checked.`);
+        notes.push(
+          r.blocked === "resolves_to_private_ip" || r.blocked === "private_or_reserved_ip"
+            ? `${r.defangedUrl} points to a private network and was not checked.`
+            : `${r.defangedUrl}: Link looks incomplete or malformed and was not checked.`,
+        );
         return;
       }
       for (const s of r.signals) signals.push({ ...s, found: `${r.defangedUrl}: ${s.found}` });

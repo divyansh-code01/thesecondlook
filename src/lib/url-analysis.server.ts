@@ -417,8 +417,11 @@ async function domainIntel(
 
   // TLS via Certificate Transparency
   try {
-    const res = await fetchWithTimeout(`https://crt.sh/?q=${encodeURIComponent(reg)}&output=json&exclude=expired`, {}, 6000);
-    if (!res.ok) throw new Error(String(res.status));
+    const res = await withRetry(async () => {
+      const r = await fetchWithTimeout(`https://crt.sh/?q=${encodeURIComponent(reg)}&output=json&exclude=expired`, {}, 10000);
+      if (!r.ok) throw new Error(String(r.status));
+      return r;
+    });
     const text = await res.text();
     const certs = JSON.parse(text.slice(0, 2_000_000)) as { not_before: string; issuer_name: string }[];
     if (certs.length === 0) {
@@ -433,7 +436,7 @@ async function domainIntel(
     checks.push({ name: "TLS certificate history", status: "completed", source: "crtsh", note: "HTTPS does not indicate that a site is trustworthy." });
   } catch {
     tls = { status: "unavailable" };
-    checks.push({ name: "TLS certificate history", status: "unavailable", source: "crtsh", note: "Certificate log (crt.sh) did not respond in time" });
+    checks.push({ name: "TLS certificate history", status: "unavailable", source: "crtsh", note: "Certificate log (crt.sh) did not respond in time; not counted in coverage", excludeFromCoverage: true });
   }
 
   return { checks, signals, dns, rdap, tls };
@@ -500,12 +503,15 @@ async function threatIntel(url: string, host: string) {
     verdicts.push({ name: "URLhaus", verdict: "unavailable", source: "urlhaus" });
   } else {
     try {
-      const res = await fetchWithTimeout(
-        "https://urlhaus-api.abuse.ch/v1/url/",
-        { method: "POST", headers: { "Auth-Key": uh, "content-type": "application/x-www-form-urlencoded" }, body: `url=${encodeURIComponent(url)}` },
-        5000,
-      );
-      if (!res.ok) throw new Error(String(res.status));
+      const res = await withRetry(async () => {
+        const r = await fetchWithTimeout(
+          "https://urlhaus-api.abuse.ch/v1/url/",
+          { method: "POST", headers: { "Auth-Key": uh, "content-type": "application/x-www-form-urlencoded" }, body: `url=${encodeURIComponent(url)}` },
+          10000,
+        );
+        if (!r.ok) throw new Error(String(r.status));
+        return r;
+      });
       const j = (await res.json()) as { query_status: string; threat?: string };
       if (j.query_status === "ok") {
         hit("urlhaus", "URLhaus", `Listed as ${j.threat ?? "malicious"}.`);
@@ -558,6 +564,26 @@ async function threatIntel(url: string, host: string) {
   }
 
   return { checks, signals, verdicts };
+}
+
+/** Run once, retry once on failure. */
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    return await fn();
+  }
+}
+
+/** Hostname that cannot be a real public domain (OCR fragment, missing TLD). */
+export function isMalformedHost(host: string): boolean {
+  const h = host.toLowerCase().replace(/\.$/, "");
+  if (h.startsWith("[") || /^[\d.]+$/.test(h)) return false;
+  if (!h.includes(".") || h.endsWith("-") || h.startsWith("-")) return true;
+  const labels = h.split(".");
+  if (labels.some((l) => !l || l.startsWith("-") || l.endsWith("-"))) return true;
+  const tld = labels[labels.length - 1];
+  return !(/^[a-z]{2,63}$/.test(tld) || /^xn--[a-z0-9-]+$/.test(tld));
 }
 
 type RdapJson = {
