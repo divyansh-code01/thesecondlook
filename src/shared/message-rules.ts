@@ -119,7 +119,7 @@ export function govLinkMismatch(text: string, urls: string[]): Signal[] {
     const isGov = /(^|\.)gov(\.[a-z]{2})?$/.test(host) || /\.gov\.[a-z]{2,3}$/.test(host);
     if (!isGov) {
       out.push(
-        makeRuleSignal("link_text_mismatch", "", {
+        makeRuleSignal("gov_claim_non_gov_link", "", {
           found: `The message claims to be from a government agency, but the link goes to ${host}, which is not a government (.gov) domain.`,
         }),
       );

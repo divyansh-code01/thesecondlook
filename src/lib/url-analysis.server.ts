@@ -120,10 +120,10 @@ export function urlHeuristics(rawUrl: string): Signal[] {
     out.push(makeSignal("suspicious_tld", { found: `The domain ends in .${tld}.` }));
   }
   const hostNoTld = host.slice(0, Math.max(0, host.length - tld.length - 1));
-  if (hostNoTld.includes("-") && !exactOfficial) {
+  if (!exactOfficial) {
     const words = HOSTNAME_TRUST_WORDS.filter((w) => hostNoTld.includes(w));
     if (words.length > 0) {
-      out.push(makeSignal("deceptive_hostname_keywords", { found: `The hostname ${host} combines hyphens with: ${words.join(", ")}.` }));
+      out.push(makeSignal("deceptive_hostname_keywords", { found: `The hostname ${host} contains: ${words.join(", ")}.` }));
     }
   }
   if (URL_SHORTENERS.has(host) || URL_SHORTENERS.has(reg)) {

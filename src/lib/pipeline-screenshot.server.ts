@@ -116,8 +116,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
         return;
       }
       for (const s of r.signals) signals.push({ ...s, found: `${r.defangedUrl}: ${s.found}` });
-      const tiOk = r.checks.filter((c) => c.status === "completed").length;
-      checks.push({ name: `Link check: ${r.defangedUrl}`, status: tiOk ? "completed" : "unavailable", source: "heuristic", note: tiOk ? undefined : "None of the link checks could complete" });
+      for (const c of r.checks) checks.push({ ...c, name: `${c.name} · ${r.defangedUrl}` });
     });
     await tracker.set("links", "done");
   }

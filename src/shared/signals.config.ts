@@ -70,10 +70,17 @@ export const SIGNALS: Record<string, SignalMeta> = {
   },
   deceptive_hostname_keywords: {
     category: "url",
-    weight: 12,
+    weight: 10,
     source: "heuristic",
-    title: "Hostname combines trust words with hyphens",
+    title: "Hostname uses trust words",
     why: "Hostnames like 'secure-login-update' string together reassuring words to look official. Real organisations rarely build their main address this way.",
+  },
+  gov_claim_non_gov_link: {
+    category: "url",
+    weight: 15,
+    source: "rules",
+    title: "Claims to be a government agency, but the link isn't a .gov domain",
+    why: "Government agencies use official government domains. A message claiming to be from one that links elsewhere is a strong impersonation sign.",
   },
   url_shortener: {
     category: "url",

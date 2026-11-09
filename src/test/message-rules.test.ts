@@ -19,9 +19,9 @@ describe("rule-based message check (no AI)", () => {
     ];
     expect(signals.some((s) => s.source === "ai")).toBe(false);
     const ids = signals.map((s) => s.id);
-    expect(ids).toEqual(expect.arrayContaining(["impersonation_org", "urgency_pressure", "credential_request", "link_text_mismatch", "suspicious_tld", "deceptive_hostname_keywords"]));
+    expect(ids).toEqual(expect.arrayContaining(["impersonation_org", "urgency_pressure", "credential_request", "gov_claim_non_gov_link", "suspicious_tld", "deceptive_hostname_keywords"]));
     const r = computeScore(signals);
-    expect(r.score).toBeGreaterThanOrEqual(50);
+    expect(r.score).toBeGreaterThanOrEqual(70);
     const report = buildReport({
       kind: "screenshot",
       inputDisplay: "test",
