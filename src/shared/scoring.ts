@@ -49,15 +49,27 @@ export const CATEGORY_LABELS: Record<SignalCategory, string> = {
 };
 
 export function computeScore(signals: Signal[]): ScoreResult {
+  // Points per signal, with AI-sourced signals limited to a shared budget
+  // (deterministic: in the order signals are listed).
+  let aiBudget = AI_SIGNAL_CAP;
+  let aiPointsRaw = 0;
   const scored = signals
     .filter((s) => s.status !== "unavailable" && s.weight !== 0)
-    .map((s) => ({ signal: s, points: pointsFor(s) }));
+    .map((s) => {
+      let points = pointsFor(s);
+      if (s.source === "ai" && points > 0) {
+        aiPointsRaw += points;
+        points = Math.min(points, aiBudget);
+        aiBudget -= points;
+      }
+      return { signal: s, points };
+    });
+  const aiPointsCounted = AI_SIGNAL_CAP - aiBudget;
+  const aiCapApplied = aiPointsRaw > aiPointsCounted;
 
-  const positivePoints = scored
-    .filter((x) => x.points > 0)
-    .reduce((sum, x) => sum + x.points, 0);
+  const positivePoints = scored.filter((x) => x.points > 0).reduce((sum, x) => sum + x.points, 0);
 
-  // 1. Per-category raw sums, each capped at its maximum.
+  // Per-category sums, each capped at its maximum.
   const categories: CategoryBreakdown[] = (["url", "domain", "message", "screenshot"] as const).map(
     (category) => {
       const raw = scored
@@ -67,15 +79,7 @@ export function computeScore(signals: Signal[]): ScoreResult {
       return { category, label: CATEGORY_LABELS[category], raw, capped: Math.min(raw, cap), cap };
     },
   );
-  const cappedTotal = categories.reduce((sum, c) => sum + c.capped, 0);
-
-  // 2. AI-sourced signals can contribute at most AI_SIGNAL_CAP points in total.
-  const aiPointsRaw = scored
-    .filter((x) => x.signal.source === "ai" && x.points > 0)
-    .reduce((sum, x) => sum + x.points, 0);
-  const aiPointsCounted = Math.min(aiPointsRaw, AI_SIGNAL_CAP);
-  const aiCapApplied = aiPointsRaw > aiPointsCounted;
-  const afterAiCap = cappedTotal - (aiPointsRaw - aiPointsCounted);
+  const afterAiCap = categories.reduce((sum, c) => sum + c.capped, 0);
 
   // 3. Mitigations (negative points) reduce the score, never below the floor.
   const mitigationPoints = scored

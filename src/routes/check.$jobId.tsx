@@ -61,9 +61,9 @@ function CheckPage() {
       if (stopped.current) return;
       try {
         const r = await getStatus({ data: { jobId } });
-        if ("job" in r) {
-          if (!r.job) return setNotFound(true);
-          const j = r.job as unknown as Job;
+        if ("json" in r) {
+          if (!r.json) return setNotFound(true);
+          const j = JSON.parse(r.json) as Job;
           setJob(j);
           if (j.status === "done" || j.status === "error") return;
         }

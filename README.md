@@ -27,3 +27,13 @@ npm run dev
 - TypeScript
 - React
 - Tailwind CSS
+
+## Second Look® — optional threat-intelligence keys
+
+All checks that need no key (link heuristics, DNS, domain registration, certificate history, AI text reading) run out of the box. Add these secrets to unlock more checks; until then each shows as UNAVAILABLE in reports:
+
+- `SAFE_BROWSING_API_KEY` — Google Safe Browsing lookups
+- `URLHAUS_AUTH_KEY` — URLhaus malicious-URL database
+- `PHISHTANK_API_KEY` — PhishTank (optional)
+- `VIRUSTOTAL_API_KEY` — VirusTotal domain reputation (optional)
+- `RATE_LIMIT_SALT` — optional custom salt for hashed network addresses
