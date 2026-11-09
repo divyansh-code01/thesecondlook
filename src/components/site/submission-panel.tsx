@@ -232,7 +232,7 @@ export function SubmissionPanel() {
       if ("error" in target) throw new Error("upload_target_failed");
       setStatusMessage(`Uploading… ${0}%`);
       await uploadWithProgress(
-        `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/upload/sign/${target.path}?token=${encodeURIComponent(target.token)}`,
+        `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/upload/sign/uploads/${target.path}?token=${encodeURIComponent(target.token)}`,
         blob,
       );
       setStatusMessage("Starting the analysis…");
