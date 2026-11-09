@@ -141,7 +141,10 @@ export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/"
               {report.checks.map((c, i) => (
                 <li key={i} className="flex justify-between gap-4 border-b border-line pb-1.5">
                   <span>{c.name}</span>
-                  <span className="uppercase text-grey-soft">{c.status}</span>
+                  <span className="text-right text-grey-soft">
+                    <span className="uppercase">{c.status}</span>
+                    {c.note && <span className="block text-[12px] normal-case">{c.status === "unavailable" && c.note === "Not configured" ? "Not configured (no API key)" : c.note}</span>}
+                  </span>
                 </li>
               ))}
             </ul>
