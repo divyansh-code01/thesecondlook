@@ -91,12 +91,12 @@ export function isPrivateV4(dotted: string): boolean {
 function parseV6(host: string): string | null {
   let h = host.toLowerCase().replace(/^\[|\]$/g, "");
   // IPv4-mapped / IPv4-in-IPv6 endings
-  const v4Match = h.match(/^(.*:)((?:\d+\.){3}\d+|0x[0-9a-f]+|\d+)$/);
+  const v4Match = h.match(/^(.*:)(\d+\.\d+\.\d+\.\d+)$/);
   if (v4Match) {
     const dotted = expandIpV4Literal(v4Match[2]);
     if (!dotted) return null;
-    const [a, b] = dotted.split(".").map(Number);
-    h = `${v4Match[1]}${(a / 16).toString(16)}${(a % 16).toString(16)}:${(b / 16).toString(16)}${(b % 16).toString(16)}`;
+    const [a, b, c, d] = dotted.split(".").map(Number);
+    h = `${v4Match[1]}${((a << 8) | b).toString(16)}:${((c << 8) | d).toString(16)}`;
   }
   if (!h.includes(":")) return null;
   // Handle "::"
