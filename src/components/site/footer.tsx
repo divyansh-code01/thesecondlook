@@ -77,6 +77,9 @@ export function SiteFooter() {
           <p className="micro-label">© {new Date().getFullYear()} Second Look</p>
           <p className="micro-label">Not a guarantee — a second look.</p>
         </div>
+        <p className="mt-4 text-[13px] text-grey-mid">
+          Second Look is an early version. Treat results as guidance, not a guarantee.
+        </p>
       </div>
     </footer>
   );
