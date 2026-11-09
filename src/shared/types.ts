@@ -107,8 +107,5 @@ export function classificationColor(cls: string): string {
 }
 
 export function defangUrl(url: string): string {
-  return url
-    .replace(/^https?:\/\//i, (m) => `h${m[0] === "h" ? "xx" : "xx"}p`) // hxxp / hxxps
-    .replace(/^http:\/\//i, "hxxp://")
-    .replace(/\./g, "[.]");
+  return url.replace(/^http(s?):\/\//i, (_m, s: string) => `hxxp${s}://`).replace(/\./g, "[.]");
 }
