@@ -207,7 +207,7 @@ export type UrlAnalysis = {
   blocked?: string;
 };
 
-type StageFn = (id: string, status: "running" | "done" | "skipped" | "unavailable") => Promise<void>;
+type StageFn = (id: string, status: "running" | "done" | "skipped" | "unavailable", note?: string) => Promise<void>;
 
 export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}, opts: { emailClaim?: boolean } = {}): Promise<UrlAnalysis> {
   const signals: Signal[] = [];
@@ -243,7 +243,12 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
   checks.push(...ti.checks);
   signals.push(...ti.signals);
   technical.threatIntel = ti.verdicts;
-  await stage("threatintel", ti.checks.every((c) => c.status === "unavailable") ? "unavailable" : "done");
+  const tiAllUnavailable = ti.checks.every((c) => c.status === "unavailable");
+  await stage(
+    "threatintel",
+    tiAllUnavailable ? "unavailable" : "done",
+    tiAllUnavailable ? (ti.checks.every((c) => c.note === "Not configured") ? "No threat-database keys are configured" : "Threat databases did not respond") : undefined,
+  );
 
   // Domain
   await stage("domain", "running");
@@ -283,7 +288,7 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
     if (domains.size > 0 && !r.blocked) {
       signals.push(makeSignal("redirect_cross_domain", { found: `The link ends up on ${[...domains].slice(0, 3).join(", ")}.` }));
     }
-    await stage("redirects", r.failed ? "unavailable" : "done");
+    await stage("redirects", r.failed ? "unavailable" : "done", r.failed ? "The site did not respond within 4 seconds" : undefined);
   } else {
     checks.push({ name: "Safe redirect following", status: "skipped", source: "heuristic", note: "Not followed (non-standard port or unresolvable)." });
     await stage("redirects", "skipped");
