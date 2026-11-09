@@ -49,3 +49,38 @@ describe("rule-based message check (no AI)", () => {
     expect(govLinkMismatch("Department of Revenue notice", ["https://tax.ny.gov/pay"])).toHaveLength(0);
   });
 });
+
+describe("OCR link rejoin and malformed hosts", () => {
+  const SPLIT =
+    "Driver License | Department of Public Safety. Office of the secretary of state. Starting 11/Aug/2021 all driver's license need to update. Follow the secure link and update your info: http://dl-secure-\nonline.quest?=DriverLicenses32fN";
+  it("rejoins a link split across lines and scores 70+", () => {
+    const refs = extractRefs(SPLIT);
+    expect(refs.urls).toEqual(["http://dl-secure-online.quest?=DriverLicenses32fN"]);
+    const signals = [...runMessageRules(SPLIT), ...govLinkMismatch(SPLIT, refs.urls), ...urlHeuristics(refs.urls[0])];
+    expect(computeScore(signals).score).toBeGreaterThanOrEqual(70);
+  });
+  it("does not join when the next line starts a new sentence after a space", () => {
+    expect(extractRefs("see https://example.com/\n Thanks").urls).toEqual(["https://example.com/"]);
+  });
+  it("flags hostnames ending in a hyphen or without a TLD as malformed", async () => {
+    const { isMalformedHost } = await import("@/lib/url-analysis.server");
+    expect(isMalformedHost("dl-secure-")).toBe(true);
+    expect(isMalformedHost("localhost")).toBe(true);
+    expect(isMalformedHost("dl-secure-online.quest")).toBe(false);
+  });
+});
+
+describe("safety net", () => {
+  it("never shows LOW RISK when a threat feed is unavailable", () => {
+    const r = buildReport({
+      kind: "url", inputDisplay: "x", signals: [],
+      checks: [
+        { name: "DNS records", status: "completed", source: "dns" },
+        { name: "URLhaus", status: "unavailable", source: "urlhaus" },
+        { name: "TLS certificate history", status: "unavailable", source: "crtsh", excludeFromCoverage: true },
+      ],
+    });
+    expect(r.classification).not.toBe("low");
+    expect(r.applicableChecks).toBe(2);
+  });
+});
