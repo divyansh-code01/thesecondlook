@@ -26,6 +26,7 @@ export type Check = {
   status: CheckStatus;
   source: string;
   note?: string;
+  excludeFromCoverage?: boolean;
 };
 
 export type StageStatus = "pending" | "running" | "done" | "skipped" | "unavailable";

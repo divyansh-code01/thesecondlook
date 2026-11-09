@@ -5,7 +5,7 @@ import { computeScore, effectiveClassification, pointsFor } from "@/shared/scori
 import type { Check, ReportPayload, Signal, TechnicalDetails } from "@/shared/types";
 
 export function coverageOf(checks: Check[]) {
-  const applicable = checks.filter((c) => c.status !== "skipped");
+  const applicable = checks.filter((c) => c.status !== "skipped" && !c.excludeFromCoverage);
   const completed = applicable.filter((c) => c.status === "completed");
   return {
     completed: completed.length,
@@ -44,7 +44,12 @@ export function buildReport(input: {
 }): ReportPayload {
   const scoreResult = computeScore(input.signals);
   const cov = coverageOf(input.checks);
-  const cls = effectiveClassification(scoreResult, cov.ratio);
+  let cls = effectiveClassification(scoreResult, cov.ratio);
+  // Safety net: never show LOW RISK while a threat-feed check is unavailable.
+  const FEEDS = new Set(["safe_browsing", "urlhaus", "phishtank", "virustotal"]);
+  if (cls.key === "low" && input.checks.some((c) => FEEDS.has(c.source) && c.status === "unavailable")) {
+    cls = { label: "INSUFFICIENT EVIDENCE", key: "insufficient" };
+  }
   const technical: TechnicalDetails = input.technical ?? { redirectChain: [], threatIntel: [], rawSignals: [] };
   technical.rawSignals = input.signals.map((s) => ({ id: s.id, weight: s.weight, confidence: s.confidence, points: pointsFor(s) }));
   return {
