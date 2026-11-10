@@ -77,6 +77,7 @@ export type ReportPayload = {
   senderLabel?: string | null;
   analysisNotes?: string[];
   demo?: boolean;
+  retryAvailable?: boolean;
 };
 
 export const CLASSIFICATION_LABELS: Record<string, string> = {
@@ -84,7 +85,7 @@ export const CLASSIFICATION_LABELS: Record<string, string> = {
   moderate: "MODERATE RISK",
   high: "HIGH RISK",
   critical: "CRITICAL RISK",
-  insufficient: "INSUFFICIENT EVIDENCE",
+  unverified: "UNVERIFIED: TREAT WITH CAUTION",
 };
 
 export function classificationForScore(score: number): "low" | "moderate" | "high" | "critical" {
@@ -99,6 +100,7 @@ export function classificationColor(cls: string): string {
     case "low":
       return "text-risk-low";
     case "moderate":
+    case "unverified":
       return "text-risk-medium";
     case "high":
     case "critical":

@@ -131,17 +131,11 @@ export function computeScore(signals: Signal[]): ScoreResult {
   };
 }
 
-/**
- * Displayed classification. Evidence coverage under 50% caps the displayed
- * classification at INSUFFICIENT EVIDENCE unless a confirmed-malicious signal exists.
- */
+/** Coverage is informational and never changes the risk classification. */
 export function effectiveClassification(
   result: ScoreResult,
-  coverage: number,
+  _coverage: number,
 ): { label: string; key: string } {
-  if (coverage < 0.5 && !result.hasConfirmedThreatFeedHit) {
-    return { label: "INSUFFICIENT EVIDENCE", key: "insufficient" };
-  }
   return { label: { low: "LOW RISK", moderate: "MODERATE RISK", high: "HIGH RISK", critical: "CRITICAL RISK" }[result.classification], key: result.classification };
 }
 

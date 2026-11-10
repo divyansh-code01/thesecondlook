@@ -17,6 +17,7 @@ import {
 import type { Check, RedirectHop, Signal, TechnicalDetails } from "@/shared/types";
 import { defangUrl } from "@/shared/types";
 import { fetchWithTimeout } from "./stages.server";
+import { checkCloudflareSecurity } from "./security-dns.server";
 
 const UA = "Mozilla/5.0 (compatible; LinkCheck/1.0)";
 
@@ -239,7 +240,8 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
 
   // Threat intel (key-gated)
   await stage("threatintel", "running");
-  const ti = await threatIntel(normalizedUrl, host);
+  const [existing, security] = await Promise.all([threatIntel(normalizedUrl, host), checkCloudflareSecurity(host)]);
+  const ti = { checks: [...existing.checks, ...security.checks], signals: [...existing.signals, ...security.signals], verdicts: [...existing.verdicts, ...security.verdicts] };
   checks.push(...ti.checks);
   signals.push(...ti.signals);
   technical.threatIntel = ti.verdicts;

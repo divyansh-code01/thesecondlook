@@ -8,6 +8,7 @@ import { saveReport } from "@/lib/reports.functions";
 import { ReportView } from "@/components/site/report-view";
 import { DEMO_REPORT } from "@/shared/demo";
 import type { ReportPayload, Stage } from "@/shared/types";
+import { fallbackReport } from "@/lib/report-build";
 
 export const Route = createFileRoute("/check/$jobId")({
   head: () => ({
@@ -101,6 +102,7 @@ function CheckPage() {
   }
 
   const errorCode = notFound ? "not_found" : timedOut ? "timeout" : job?.status === "error" ? job.error_code ?? "pipeline_failed" : null;
+  if (errorCode) return <ReportView report={fallbackReport(job?.type === "url" ? "url" : "screenshot", notFound ? "This check could not be found or has expired." : ERRORS[errorCode] ?? ERRORS.pipeline_failed)} />;
 
   return (
     <main id="main" className="py-16">
