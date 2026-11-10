@@ -1,7 +1,7 @@
 # Second Look® — analysis fixes
 
 ## Current request
-- [ ] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
+- [x] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
 - [ ] Priority 2: unknown-domain scoring and reliable parallel checks, core coverage, URL cache.
 - [ ] Priority 3: Quad9, scheduled threat lists, destination checks, screenshot rules, honesty text.
 - [ ] Run requested regression tests and live checks; report completed rules and blockers.

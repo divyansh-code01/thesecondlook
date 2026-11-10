@@ -51,7 +51,10 @@ export async function fetchWithTimeout(url: string, init: RequestInit = {}, ms =
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
   try {
-    return await fetch(url, { ...init, signal: ctrl.signal });
+    const response = await fetch(url, { ...init, signal: init.signal ? AbortSignal.any([ctrl.signal, init.signal]) : ctrl.signal });
+    // Buffer provider responses while the timeout is active; HEAD/range bodies are tiny.
+    const body = await response.arrayBuffer();
+    return new Response(body.byteLength ? body : null, { status: response.status, statusText: response.statusText, headers: response.headers });
   } finally {
     clearTimeout(t);
   }

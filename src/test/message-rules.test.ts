@@ -81,6 +81,6 @@ describe("safety net", () => {
       ],
     });
     expect(r.classification).not.toBe("low");
-    expect(r.applicableChecks).toBe(2);
+    expect(r.applicableChecks).toBe(1);
   });
 });

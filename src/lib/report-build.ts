@@ -5,7 +5,10 @@ import { computeScore, effectiveClassification, pointsFor } from "@/shared/scori
 import type { Check, ReportPayload, Signal, TechnicalDetails } from "@/shared/types";
 
 export function coverageOf(checks: Check[]) {
-  const applicable = checks.filter((c) => c.status !== "skipped" && !c.excludeFromCoverage);
+  const applicable = checks.filter((c) => c.status !== "skipped" && !c.excludeFromCoverage && (
+    ["dns", "cloudflare_security", "quad9", "safe_browsing", "known_threats"].includes(c.source) ||
+    (c.source === "heuristic" && /Link parsing and normalization|Link pattern heuristics/.test(c.name))
+  ));
   const completed = applicable.filter((c) => c.status === "completed");
   return {
     completed: completed.length,
