@@ -111,6 +111,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
       /* unparseable */
     }
     if (!host || isMalformedHost(host)) {
+      technical.rdap = { status: "unverified", ageDays: 0 };
       notes.push(`${defangUrl(raw)}: Link looks incomplete or malformed and was not checked.`);
       try {
         for (const s of urlHeuristics(raw)) signals.push({ ...s, found: `${defangUrl(raw)}: ${s.found}` });
@@ -128,6 +129,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
     const results = await Promise.all(urls.map((u) => analyzeUrl(u, async () => {}, { signal: budget }).catch(() => null)));
     results.forEach((r, i) => {
       if (!r) {
+        technical.rdap = { status: "unverified", ageDays: 0 };
         checks.push({ name: `Link check: ${defangUrl(urls[i])}`, status: "unavailable", source: "heuristic", note: "The link checks failed to run" });
         return;
       }

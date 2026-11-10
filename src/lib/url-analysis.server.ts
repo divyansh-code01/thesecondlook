@@ -276,7 +276,11 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
   ];
   await Promise.race([Promise.allSettled(tasks), new Promise<void>((resolve) => { if (deadline.aborted) resolve(); else deadline.addEventListener("abort", () => resolve(), { once: true }); })]);
   for (const [name, source] of CORE_CHECKS) if (!checks.some((c) => c.name === name)) checks.push({ name, source, status: "unavailable", note: "The check did not finish within the 15-second analysis budget" });
-  for (const id of ["validate", "threatintel", "domain", "redirects", "patterns"]) await stage(id, "done");
+  for (const [id, sources] of [["validate", ["heuristic"]], ["threatintel", ["cloudflare_security", "quad9", "safe_browsing", "known_threats"]], ["domain", ["dns", "rdap", "crtsh"]], ["redirects", ["redirects"]], ["patterns", ["heuristic"]]] as const) {
+    const relevant = id === "redirects" ? checks.filter((c) => c.name === "Safe redirect following") : checks.filter((c) => (sources as readonly string[]).includes(c.source));
+    const unavailable = relevant.length > 0 && relevant.every((c) => c.status === "unavailable");
+    await stage(id, unavailable ? "unavailable" : "done", unavailable ? relevant[0]?.note : undefined);
+  }
   const result = structuredClone({ normalizedUrl, defangedUrl: defangUrl(normalizedUrl), finalUrl, hops: technical.redirectChain, signals, checks, technical, blocked });
   if (!opts.skipCache && !blocked) {
     try {

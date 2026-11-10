@@ -21,7 +21,7 @@ export async function checkKnownThreats(url: string, host: string) {
     if (state.error || matches.error) throw new Error("list_unavailable");
     const cutoff = Date.now() - 86400000;
     const fresh = new Set((state.data ?? []).filter((r) => r.entry_count > 0 && Date.parse(r.fetched_at) >= cutoff).map((r) => r.source));
-    const hits = (matches.data ?? []).filter((r) => fresh.has(r.source) && Date.parse(r.fetched_at) >= cutoff && (!r.url || r.url === url));
+    const hits = (matches.data ?? []).filter((r) => fresh.has(r.source) && Date.parse(r.fetched_at) >= cutoff);
     for (const hit of hits) signals.push({ id: "threat_feed_hit", ...SIGNALS.threat_feed_hit, source: hit.source, status: "confirmed", confidence: 1, title: `Listed by ${hit.source}`, found: `${host} matches the active phishing list.` });
     const complete = FEEDS.every((f) => fresh.has(f.source));
     checks.push({ name, source, status: complete ? "completed" : "unavailable", note: complete ? undefined : "One or more phishing lists are empty or older than 24 hours" });
@@ -52,9 +52,13 @@ export async function refreshThreatLists() {
     }
     if (!rows.size) throw new Error("empty_feed");
     const entries = [...rows.values()];
-    for (let i = 0; i < entries.length; i += 1000) {
-      const { error } = await admin.from("known_threats").upsert(entries.slice(i, i + 1000));
-      if (error) throw new Error("feed_store_failed");
+    for (let i = 0; i < entries.length; i += 20000) {
+      await Promise.all([0, 5000, 10000, 15000].map(async (offset) => {
+        const chunk = entries.slice(i + offset, i + offset + 5000);
+        if (!chunk.length) return;
+        const { error } = await admin.from("known_threats").upsert(chunk);
+        if (error) throw new Error("feed_store_failed");
+      }));
     }
     const { error } = await admin.from("threat_feed_refresh").upsert({ source: feed.source, fetched_at, entry_count: entries.length });
     if (error) throw new Error("feed_store_failed");
