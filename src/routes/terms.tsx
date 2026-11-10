@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProsePage } from "@/components/site/prose-page";
 
 export const Route = createFileRoute("/terms")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Terms — Second Look®" },
@@ -9,8 +10,10 @@ export const Route = createFileRoute("/terms")({
       { property: "og:title", content: "Terms — Second Look®" },
       { property: "og:description", content: "An automated second opinion, not a guarantee." },
       { property: "og:type", content: "article" },
+      { property: "og:url", content: "https://thesecondlook.lovable.app/terms" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/terms" }],
   }),
   component: () => (
     <ProsePage label="TERMS" title="THE SHORT" grey="VERSION.">

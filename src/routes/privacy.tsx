@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProsePage } from "@/components/site/prose-page";
 
 export const Route = createFileRoute("/privacy")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Privacy — Second Look®" },
@@ -9,8 +10,10 @@ export const Route = createFileRoute("/privacy")({
       { property: "og:title", content: "Privacy — Second Look®" },
       { property: "og:description", content: "Screenshots deleted after text extraction. Nothing stored unless you save a report." },
       { property: "og:type", content: "article" },
+      { property: "og:url", content: "https://thesecondlook.lovable.app/privacy" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/privacy" }],
   }),
   component: () => (
     <ProsePage label="PRIVACY" title="WHAT WE KEEP." grey="(ALMOST NOTHING.)">

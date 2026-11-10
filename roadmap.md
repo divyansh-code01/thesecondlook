@@ -1,6 +1,9 @@
 # Second Look® — analysis fixes
 
 ## Current request
+- [x] SEO: router-derived sitemap for public pages, crawler discovery, self-canonicals, and crawlable homepage description.
+- [x] SEO: preview XML and homepage verified; three sitemap/routing tests pass; live readiness checked.
+- [ ] SEO publication: awaiting publishing; live /sitemap.xml currently returns 404, so submission is not ready yet.
 - [x] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
 - [x] Rule 2: unknown-domain points, age points, and minimum 50 for domain plus message warnings.
 - [x] Rule 4: parallel URL checks, shared 15-second budget, core coverage, ten-minute cache, caution fallback.

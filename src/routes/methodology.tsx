@@ -3,6 +3,7 @@ import { ProsePage } from "@/components/site/prose-page";
 import { AI_SIGNAL_CAP, CATEGORY_CAPS, SIGNALS, THREAT_FEED_FLOOR } from "@/shared/signals.config";
 
 export const Route = createFileRoute("/methodology")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Methodology — Second Look®" },
@@ -10,8 +11,10 @@ export const Route = createFileRoute("/methodology")({
       { property: "og:title", content: "Methodology — Second Look®" },
       { property: "og:description", content: "Detection layers, weights and the honest limits of an automated scam check." },
       { property: "og:type", content: "article" },
+      { property: "og:url", content: "https://thesecondlook.lovable.app/methodology" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/methodology" }],
   }),
   component: Methodology,
 });

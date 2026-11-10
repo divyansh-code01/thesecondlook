@@ -11,6 +11,7 @@ import type { ReportPayload, Stage } from "@/shared/types";
 import { fallbackReport } from "@/lib/report-build";
 
 export const Route = createFileRoute("/check/$jobId")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Checking… — Second Look®" },
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/check/$jobId")({
       { property: "og:title", content: "Second Look® analysis" },
       { property: "og:description", content: "Evidence-based scam check in progress." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CheckPage,
