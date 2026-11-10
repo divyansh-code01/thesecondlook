@@ -94,7 +94,7 @@ export function urlHeuristics(rawUrl: string): Signal[] {
       out.push(
         makeSignal("brand_lookalike_domain", {
           found: `"${reg}" resembles ${lookalike.brand}, whose official domain is ${lookalike.domain}.`,
-          confidence: 0.9,
+          confidence: 1,
         }),
       );
     } else {
@@ -239,13 +239,16 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
   await Promise.all(["validate", "threatintel", "domain", "redirects", "patterns"].map((id) => stage(id, "running")));
   const guardPromise = resolveAndGuard(host, deadline);
   const tasks = [
-    threatIntel(normalizedUrl, host, deadline).then(commit),
+    threatIntel(normalizedUrl, host, deadline, commit),
     checkCloudflareSecurity(host, deadline).then(commit),
     checkQuad9(host, guardPromise, deadline).then(commit),
     checkKnownThreats(normalizedUrl, host).then(commit),
     guardPromise.then(async (guard) => {
       if (!guard.ok && guard.reason !== "dns_failed") { blocked = guard.reason; return; }
-      const domainTasks = domainIntel(registrableDomain(host), host, guard, opts.emailClaim ?? false, deadline);
+      const domainTasks = domainIntel(registrableDomain(host), host, guard, opts.emailClaim ?? false, deadline, (dom) => {
+        commit(dom);
+        if (!deadline.aborted) { technical.dns = dom.dns; technical.rdap = dom.rdap; technical.tls = dom.tls; }
+      });
       const redirectTask = (async () => {
         if (guard.nxdomain) {
           commit({ signals: [], checks: [{ name: "Safe redirect following", source: "heuristic", status: "completed", note: NONEXISTENT_NOTE, excludeFromCoverage: true }] });
@@ -268,10 +271,7 @@ export async function analyzeUrl(rawUrl: string, stage: StageFn = async () => {}
           }
         }
       })();
-      await Promise.all([domainTasks.then((dom) => {
-        commit(dom);
-        if (!deadline.aborted) { technical.dns = dom.dns; technical.rdap = dom.rdap; technical.tls = dom.tls; }
-      }), redirectTask]);
+      await Promise.all([domainTasks, redirectTask]);
     }),
   ];
   await Promise.race([Promise.allSettled(tasks), new Promise<void>((resolve) => { if (deadline.aborted) resolve(); else deadline.addEventListener("abort", () => resolve(), { once: true }); })]);
@@ -333,6 +333,7 @@ async function domainIntel(
   guard: { ok: boolean; ips: string[]; dnsFailed?: boolean; nxdomain?: boolean },
   emailClaim: boolean,
   signal?: AbortSignal,
+  publish: (data: { checks: Check[]; signals: Signal[]; dns: TechnicalDetails["dns"]; rdap: TechnicalDetails["rdap"]; tls: TechnicalDetails["tls"] }) => void = () => {},
 ) {
   const checks: Check[] = [];
   const signals: Signal[] = [];
@@ -342,6 +343,7 @@ async function domainIntel(
 
   if (expandIpV4Literal(host) || host.startsWith("[")) {
     checks.push({ name: "Domain registration (RDAP)", status: "skipped", source: "rdap", note: "IP address, no domain" });
+    publish({ checks: checks.splice(0), signals: signals.splice(0), dns, rdap, tls });
     return { checks, signals, dns, rdap, tls };
   }
 
@@ -361,6 +363,7 @@ async function domainIntel(
     if (emailClaim && mx.length === 0) signals.push(makeSignal("dns_no_mx_for_email_claim", { found: `${reg} publishes no mail servers.` }));
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), dns, rdap, tls });
   // RDAP
   const r = await rdapPromise;
   if (r.kind === "unavailable") {
@@ -389,10 +392,12 @@ async function domainIntel(
     }
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), dns, rdap, tls });
   // TLS: not applicable to a domain that does not resolve
   if (guard.nxdomain) {
     tls = { status: "not applicable" };
     checks.push({ name: "TLS certificate history", status: "completed", source: "crtsh", note: NONEXISTENT_NOTE, excludeFromCoverage: true });
+    publish({ checks: checks.splice(0), signals: signals.splice(0), dns, rdap, tls });
     return { checks, signals, dns, rdap, tls };
   }
 
@@ -417,10 +422,11 @@ async function domainIntel(
     checks.push({ name: "TLS certificate history", status: "unavailable", source: "crtsh", note: "Certificate log (crt.sh) did not respond in time; not counted in coverage", excludeFromCoverage: true });
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), dns, rdap, tls });
   return { checks, signals, dns, rdap, tls };
 }
 
-async function threatIntel(url: string, host: string, signal?: AbortSignal) {
+async function threatIntel(url: string, host: string, signal?: AbortSignal, publish: (data: { checks: Check[]; signals: Signal[]; verdicts: TechnicalDetails["threatIntel"] }) => void = () => {}) {
   const checks: Check[] = [];
   const signals: Signal[] = [];
   const verdicts: { name: string; verdict: string; source: string }[] = [];
@@ -476,6 +482,7 @@ async function threatIntel(url: string, host: string, signal?: AbortSignal) {
     }
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), verdicts: verdicts.splice(0) });
   })());
   tasks.push((async () => {
   // URLhaus
@@ -506,6 +513,7 @@ async function threatIntel(url: string, host: string, signal?: AbortSignal) {
     }
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), verdicts: verdicts.splice(0) });
   })());
   tasks.push((async () => {
   // PhishTank (optional)
@@ -529,6 +537,7 @@ async function threatIntel(url: string, host: string, signal?: AbortSignal) {
     }
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), verdicts: verdicts.splice(0) });
   })());
   tasks.push((async () => {
   // VirusTotal (optional, domain reputation)
@@ -549,6 +558,7 @@ async function threatIntel(url: string, host: string, signal?: AbortSignal) {
     }
   }
 
+  publish({ checks: checks.splice(0), signals: signals.splice(0), verdicts: verdicts.splice(0) });
   })());
   await Promise.allSettled(tasks);
   return { checks, signals, verdicts };
