@@ -99,8 +99,10 @@ export function computeScore(signals: Signal[]): ScoreResult {
   const afterFloor = hasConfirmedThreatFeedHit
     ? Math.max(afterMitigation, THREAT_FEED_FLOOR)
     : afterMitigation;
-
-  const score = Math.max(0, Math.min(100, Math.round(afterFloor)));
+  const riskyDomain = signals.some((s) => ["domain_very_new", "domain_unresolvable"].includes(s.id));
+  const messageWarning = signals.some((s) => ["urgency_pressure", "impersonation_org", "credential_request", "payment_request"].includes(s.id) && pointsFor(s) > 0);
+  const domainMessageFloor = riskyDomain && messageWarning && afterFloor < 50;
+  const score = Math.max(0, Math.min(100, Math.round(domainMessageFloor ? 50 : afterFloor)));
 
   const steps: string[] = [];
   for (const c of categories) {
@@ -113,6 +115,7 @@ export function computeScore(signals: Signal[]): ScoreResult {
   if (aiCapApplied) steps.push(`AI-sourced signals capped at ${aiPointsCounted} pts`);
   if (mitigationPoints < 0) steps.push(`Mitigation: ${mitigationPoints} pts${mitigationFloorApplied ? ` (floor ${MITIGATION_FLOOR} applied)` : ""}`);
   if (hasConfirmedThreatFeedHit) steps.push(`Confirmed threat-feed hit: minimum ${THREAT_FEED_FLOOR} applied`);
+  if (domainMessageFloor) steps.push("New or unresolvable domain with message warning: minimum 50 applied");
   steps.push(`Final score: ${score} / 100`);
 
   return {
@@ -131,17 +134,11 @@ export function computeScore(signals: Signal[]): ScoreResult {
   };
 }
 
-/**
- * Displayed classification. Evidence coverage under 50% caps the displayed
- * classification at INSUFFICIENT EVIDENCE unless a confirmed-malicious signal exists.
- */
+/** Coverage is informational and never changes the risk classification. */
 export function effectiveClassification(
   result: ScoreResult,
-  coverage: number,
+  _coverage: number,
 ): { label: string; key: string } {
-  if (coverage < 0.5 && !result.hasConfirmedThreatFeedHit) {
-    return { label: "INSUFFICIENT EVIDENCE", key: "insufficient" };
-  }
   return { label: { low: "LOW RISK", moderate: "MODERATE RISK", high: "HIGH RISK", critical: "CRITICAL RISK" }[result.classification], key: result.classification };
 }
 

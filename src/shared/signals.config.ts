@@ -163,10 +163,10 @@ export const SIGNALS: Record<string, SignalMeta> = {
   },
   domain_unresolvable: {
     category: "domain",
-    weight: 6,
+    weight: 15,
     source: "dns",
-    title: "Domain does not resolve",
-    why: "The domain has no working address records. It may be new, defunct or configured to appear only in certain regions.",
+    title: "Domain does not exist or has been taken down",
+    why: "This domain does not exist or has been taken down. Do not use it.",
   },
 
   // ---------- Message layer ----------

@@ -7,38 +7,21 @@ import { computeScore, pointsFor, CATEGORY_LABELS } from "@/shared/scoring";
 import { CLASSIFICATION_LABELS, classificationColor } from "@/shared/types";
 import type { ReportPayload, Signal } from "@/shared/types";
 import { defangForDisplay } from "@/shared/sanitize";
+import { buildReport } from "@/lib/report-build";
+import { Button } from "@/components/ui/button";
 
 const DISCLAIMER =
   "This is an automated assessment based on the checks listed above. It is not a guarantee. When in doubt, contact the organization using details you find independently.";
 
 function actionsFor(cls: string): string[] {
-  if (cls === "high" || cls === "critical")
-    return [
+  void cls;
+  return [
       "Don't click the link or reply to the message.",
-      "Don't enter any personal information.",
-      "Never share one-time codes (OTPs) or passwords — no real organisation asks for them.",
-      "Don't send money, gift cards or crypto.",
+      "Look up the organization's official website or phone number yourself and contact them.",
+      "Never share OTPs, passwords or card details.",
       "Report it to your national cybercrime service, and to your bank or the company being impersonated.",
-      "Block the sender.",
       "If you already clicked or shared something: change your passwords and contact your bank straight away.",
     ];
-  if (cls === "moderate")
-    return [
-      "Don't act on it yet.",
-      "Verify through an official channel you look up yourself (the company's own app or website).",
-      "Don't use phone numbers, links or emails from the message itself.",
-    ];
-  if (cls === "low")
-    return [
-      "No major threats were detected in the available checks.",
-      "Still verify the sender independently before acting.",
-      "Avoid sharing passwords, codes or payment details by message.",
-    ];
-  return [
-    "Too few checks could complete to give a reliable result.",
-    "Try a sharper, uncropped screenshot, or paste the link from the message as well.",
-    "Until then, treat the message with caution and verify it through an official channel.",
-  ];
 }
 
 function Tag({ s }: { s: Signal }) {
@@ -60,15 +43,15 @@ function Accordion({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/" }: {
+export function ReportView({ report: originalReport, onSave, saveState, analyzeAnotherHref = "/" }: {
   report: ReportPayload;
   onSave?: () => void;
   saveState?: "idle" | "saving" | "saved";
   analyzeAnotherHref?: string;
 }) {
+  const report = useMemo(() => ({ ...originalReport, ...buildReport({ kind: originalReport.kind, inputDisplay: originalReport.inputDisplay, signals: originalReport.signals, checks: originalReport.checks, technical: originalReport.technical }), }), [originalReport]);
   const [showAll, setShowAll] = useState(false);
   const calc = useMemo(() => computeScore(report.signals), [report.signals]);
-  const insufficient = report.classification === "insufficient";
   const label = CLASSIFICATION_LABELS[report.classification] ?? report.classification;
   const color = classificationColor(report.classification);
 
@@ -83,7 +66,7 @@ export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/"
 
   function copySummary() {
     const lines = [
-      `Second Look report — ${label}${insufficient ? "" : ` (${report.score}/100)`}`,
+      `Second Look report — ${label} (${report.score}/100)`,
       `Input: ${report.inputDisplay}`,
       "",
       report.summary,
@@ -117,15 +100,16 @@ export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/"
       <section className="mt-10 grid gap-10 border-t border-line pt-10 md:grid-cols-2" aria-live="polite">
         <div>
           <p className="heading-display text-[clamp(64px,10vw,128px)]">
-            {insufficient ? "—" : report.score}
-            {!insufficient && <span className="tone-grey text-[0.3em]"> / 100</span>}
+            {report.score}
+            <span className="tone-grey text-[0.3em]"> / 100</span>
           </p>
           <p className={`heading-display mt-3 text-[18px] ${color}`}>{label}</p>
+          <p className="mt-4 text-[13px] text-grey-mid">No tool can catch every scam. If something feels wrong, contact the organization using details you find yourself.</p>
           <div className="relative mt-6 h-[2px] w-full bg-line" aria-hidden>
             {[25, 50, 75].map((t) => (
               <span key={t} className="absolute -top-1 h-2.5 w-px bg-line-strong" style={{ left: `${t}%` }} />
             ))}
-            {!insufficient && <span className="absolute -top-1.5 size-3.5 -translate-x-1/2 rounded-full bg-foreground" style={{ left: `${report.score}%` }} />}
+            <span className="absolute -top-1.5 size-3.5 -translate-x-1/2 rounded-full bg-foreground" style={{ left: `${report.score}%` }} />
           </div>
           <div className="mt-2 flex justify-between text-[10.5px] text-grey-soft">
             <span>LOW</span><span>MODERATE</span><span>HIGH</span><span>CRITICAL</span>
@@ -198,6 +182,15 @@ export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/"
         <ol className="mt-4 list-decimal space-y-2 pl-5 text-[15px]">
           {actionsFor(report.classification).map((a) => <li key={a}>{a}</li>)}
         </ol>
+        <p className="micro-label mt-8">Check this elsewhere</p>
+        <div className="mt-4 flex flex-wrap gap-4 print-hidden">
+          {[
+            ["VirusTotal URL search", "https://www.virustotal.com/gui/search/"],
+            ["Google Safe Browsing Transparency Report", "https://transparencyreport.google.com/safe-browsing/search"],
+            ["urlscan.io search", "https://urlscan.io/search/"],
+          ].map(([name, href]) => <Button key={name} asChild variant="link" className="link-arrow h-auto whitespace-normal p-0 text-left"><a href={href} target="_blank" rel="noopener noreferrer">{name} →</a></Button>)}
+        </div>
+        {report.retryAvailable && <Link to="/" hash="submit" className="btn-pill mt-6">Try again</Link>}
       </section>
 
       {/* Utility row */}
@@ -269,7 +262,6 @@ export function ReportView({ report, onSave, saveState, analyzeAnotherHref = "/"
           <ol className="list-decimal space-y-1.5 pl-5 text-[14px]">
             <li>Each finding's points = weight × confidence, rounded.</li>
             {calc.steps.map((s) => <li key={s}>{s}</li>)}
-            {insufficient && <li>Coverage below 50%: classification shown as INSUFFICIENT EVIDENCE.</li>}
           </ol>
           <Link to="/methodology" className="link-arrow mt-4">Read the methodology →</Link>
         </Accordion>

@@ -35,7 +35,7 @@ function Methodology() {
         <li>AI-sourced findings add at most {AI_SIGNAL_CAP} points in total.</li>
         <li>A confirmed threat-feed hit sets a minimum score of {THREAT_FEED_FLOOR}.</li>
         <li>Mitigations can reduce the score by up to 15, never below 5.</li>
-        <li>0–24 Low · 25–49 Moderate · 50–74 High · 75–100 Critical. Under 50% evidence coverage shows Insufficient evidence.</li>
+        <li>0–24 Low · 25–49 Moderate · 50–74 High · 75–100 Critical. Low scores remain unverified unless a threat check completed cleanly, the domain resolves and is at least a year old, and no warning signals were found. Coverage is informational only.</li>
       </ul>
       <h2>Weight table</h2>
       <div className="overflow-x-auto">

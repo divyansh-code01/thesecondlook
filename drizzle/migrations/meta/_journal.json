@@ -15,6 +15,20 @@
       "when": 1794113290660,
       "tag": "0001_jobs_input_column",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794288055855,
+      "tag": "0002_url_analysis_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794288134980,
+      "tag": "0003_known_phishing_threats",
+      "breakpoints": true
     }
   ]
 }

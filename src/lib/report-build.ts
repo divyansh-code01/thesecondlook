@@ -5,7 +5,10 @@ import { computeScore, effectiveClassification, pointsFor } from "@/shared/scori
 import type { Check, ReportPayload, Signal, TechnicalDetails } from "@/shared/types";
 
 export function coverageOf(checks: Check[]) {
-  const applicable = checks.filter((c) => c.status !== "skipped" && !c.excludeFromCoverage);
+  const applicable = checks.filter((c) => c.status !== "skipped" && !c.excludeFromCoverage && (
+    ["dns", "cloudflare_security", "quad9", "safe_browsing", "known_threats"].includes(c.source) ||
+    (c.source === "heuristic" && /Link parsing and normalization|Link pattern heuristics/.test(c.name))
+  ));
   const completed = applicable.filter((c) => c.status === "completed");
   return {
     completed: completed.length,
@@ -30,7 +33,7 @@ export function buildSummary(cls: string, signals: Signal[], kind: "url" | "scre
     case "low":
       return `No major threats were detected in the available checks. That is not a guarantee — verify the sender independently and avoid sharing sensitive information.`;
     default:
-      return `Too few checks could run to give a reliable assessment of ${subject}. See which checks were unavailable below, and try again or add more context.`;
+      return "We found no confirmed warning, but this link or message is not in any threat database we checked. New scams often aren't listed yet. Don't treat this as safe.";
   }
 }
 
@@ -45,10 +48,12 @@ export function buildReport(input: {
   const scoreResult = computeScore(input.signals);
   const cov = coverageOf(input.checks);
   let cls = effectiveClassification(scoreResult, cov.ratio);
-  // Safety net: never show LOW RISK while a threat-feed check is unavailable.
-  const FEEDS = new Set(["safe_browsing", "urlhaus", "phishtank", "virustotal"]);
-  if (cls.key === "low" && input.checks.some((c) => FEEDS.has(c.source) && c.status === "unavailable")) {
-    cls = { label: "INSUFFICIENT EVIDENCE", key: "insufficient" };
+  const cleanFeed = input.technical?.threatIntel.some((v) => ["not listed", "not flagged"].includes(v.verdict) && input.checks.some((c) => c.source === v.source && c.status === "completed"));
+  const resolves = input.technical?.dns?.records.some((r) => ["A", "AAAA"].includes(r.type));
+  const established = resolves && (input.technical?.rdap?.ageDays ?? 0) >= 365;
+  const warnings = input.signals.some((s) => pointsFor(s) > 0 && s.status !== "unavailable");
+  if (cls.key === "low" && (!cleanFeed || !established || warnings)) {
+    cls = { label: "UNVERIFIED: TREAT WITH CAUTION", key: "unverified" };
   }
   const technical: TechnicalDetails = input.technical ?? { redirectChain: [], threatIntel: [], rawSignals: [] };
   technical.rawSignals = input.signals.map((s) => ({ id: s.id, weight: s.weight, confidence: s.confidence, points: pointsFor(s) }));
@@ -66,4 +71,8 @@ export function buildReport(input: {
     technical,
     ...input.extra,
   };
+}
+
+export function fallbackReport(kind: "url" | "screenshot", note: string): ReportPayload {
+  return buildReport({ kind, inputDisplay: kind === "url" ? "Link check" : "Screenshot", signals: [], checks: [{ name: "Analysis", source: "pipeline", status: "unavailable", note }], extra: { analysisNotes: [note], retryAvailable: true } });
 }

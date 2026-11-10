@@ -107,7 +107,7 @@ export const CREDENTIAL_KEYWORDS = [
 
 /** Trust words that, combined with hyphens in a hostname, are a phishing pattern. */
 export const HOSTNAME_TRUST_WORDS = [
-  "secure", "verify", "login", "update", "account", "online", "official", "support",
+  "secure", "verify", "login", "update", "account", "online", "official", "support", "wallet", "claim",
 ];
 
 export const URL_SHORTENERS = new Set([
