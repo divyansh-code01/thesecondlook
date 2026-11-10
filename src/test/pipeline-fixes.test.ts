@@ -2,6 +2,10 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 import { buildReport, fallbackReport } from "@/lib/report-build";
 import { checkCloudflareSecurity, cloudflareBlocked } from "@/lib/security-dns.server";
 import { computeScore } from "@/shared/scoring";
+import { SIGNALS } from "@/shared/signals.config";
+import { urlHeuristics } from "@/lib/url-analysis.server";
+import { coverageOf } from "@/lib/report-build";
+import type { Signal } from "@/shared/types";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -30,5 +34,25 @@ describe("Cloudflare threat blocking", () => {
     const result = await checkCloudflareSecurity("phishing.test");
     expect(result.checks[0].status).toBe("completed");
     expect(computeScore(result.signals).score).toBe(85);
+  });
+});
+
+const signal = (id: string): Signal => ({ id, ...SIGNALS[id], source: "rules", status: "suspicious", confidence: 1, found: "test" });
+describe("unknown means caution", () => {
+  it("NXDOMAIN adds exactly 15", () => expect(computeScore([signal("domain_unresolvable")]).score).toBe(15));
+  it("new domain adds 15, and 30–90 days adds 8", () => {
+    expect(computeScore([signal("domain_very_new")]).score).toBe(15);
+    expect(computeScore([signal("domain_new")]).score).toBe(8);
+  });
+  it.each(["domain_unresolvable", "domain_very_new"])("%s plus urgency has minimum 50", (id) => expect(computeScore([signal(id), signal("urgency_pressure")]).score).toBe(50));
+  it("nonexistent risky link is at least moderate", () => expect(computeScore([...urlHeuristics("https://secure-login-verify-account-xyz123.top"), signal("domain_unresolvable")]).score).toBeGreaterThanOrEqual(25));
+  it("bonus checks never reduce core coverage", () => expect(coverageOf([{ name: "DNS", source: "dns", status: "completed" }, { name: "URLhaus", source: "urlhaus", status: "unavailable" }, { name: "Certificate", source: "crtsh", status: "unavailable" }]).ratio).toBe(1));
+  it("required URL weights are retained", () => {
+    expect(SIGNALS.deceptive_hostname_keywords.weight).toBe(10);
+    expect(SIGNALS.suspicious_tld.weight).toBe(8);
+    expect(SIGNALS.brand_lookalike_domain.weight).toBe(25);
+    expect(SIGNALS.ip_literal_host.weight).toBe(20);
+    expect(SIGNALS.url_shortener.weight).toBe(10);
+    expect(SIGNALS.sender_name_mismatch.weight).toBe(10);
   });
 });
