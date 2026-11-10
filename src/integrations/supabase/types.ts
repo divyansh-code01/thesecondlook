@@ -122,6 +122,24 @@ export type Database = {
         }
         Relationships: []
       }
+      url_analysis_cache: {
+        Row: {
+          expires_at: string
+          payload: Json
+          url_hash: string
+        }
+        Insert: {
+          expires_at: string
+          payload: Json
+          url_hash: string
+        }
+        Update: {
+          expires_at?: string
+          payload?: Json
+          url_hash?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
