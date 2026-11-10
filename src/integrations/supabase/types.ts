@@ -56,6 +56,27 @@ export type Database = {
         }
         Relationships: []
       }
+      known_threats: {
+        Row: {
+          fetched_at: string
+          host: string
+          source: string
+          url: string
+        }
+        Insert: {
+          fetched_at?: string
+          host: string
+          source: string
+          url?: string
+        }
+        Update: {
+          fetched_at?: string
+          host?: string
+          source?: string
+          url?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           count: number
@@ -119,6 +140,24 @@ export type Database = {
           score?: number
           signals?: Json
           summary?: string
+        }
+        Relationships: []
+      }
+      threat_feed_refresh: {
+        Row: {
+          entry_count: number
+          fetched_at: string
+          source: string
+        }
+        Insert: {
+          entry_count: number
+          fetched_at: string
+          source: string
+        }
+        Update: {
+          entry_count?: number
+          fetched_at?: string
+          source?: string
         }
         Relationships: []
       }
