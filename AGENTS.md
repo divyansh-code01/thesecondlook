@@ -18,3 +18,4 @@
 - Pipeline "edge functions" from the spec are TanStack server functions in `src/lib/*.functions.ts`. Why: platform uses server functions, not edge functions.
 - URL checks publish completed evidence independently under a shared 15-second cancellation budget, with a private hashed-URL cache; coverage is informational. Why: slow optional providers must not erase evidence or dead-end reports.
 - Scheduled phishing-list refresh uses a managed-authenticated TanStack public server route and private threat tables. Why: no API key or client table access is needed.
+- Sitemap entries derive from required route-level sitemap decisions; private reports, checks, and API endpoints are excluded. Why: public page discovery stays synchronized with routing without exposing submissions.

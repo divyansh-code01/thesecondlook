@@ -9,6 +9,7 @@ import { ReportView } from "@/components/site/report-view";
 import type { ReportPayload } from "@/shared/types";
 
 export const Route = createFileRoute("/report/$id")({
+  staticData: { sitemap: false },
   validateSearch: (s) => z.object({ token: z.string().optional() }).parse(s),
   head: () => ({
     meta: [
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/report/$id")({
       { property: "og:title", content: "Second Look® saved report" },
       { property: "og:description", content: "An evidence-based scam-check report." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ReportPage,

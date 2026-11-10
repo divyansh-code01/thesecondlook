@@ -1,6 +1,8 @@
 # Second Look® — analysis fixes
 
 ## Current request
+- [ ] SEO: router-derived sitemap for public pages, crawler discovery, self-canonicals, and crawlable homepage description.
+- [ ] SEO: verify sitemap and homepage, run tests, and confirm live submission readiness.
 - [x] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
 - [x] Rule 2: unknown-domain points, age points, and minimum 50 for domain plus message warnings.
 - [x] Rule 4: parallel URL checks, shared 15-second budget, core coverage, ten-minute cache, caution fallback.

@@ -7,6 +7,7 @@ import { DarkCta } from "@/components/site/dark-cta";
 import { CATEGORY_CAPS } from "@/shared/signals.config";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Second Look® — Before you trust it, check it." },
@@ -14,8 +15,10 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Second Look® — Before you trust it, check it." },
       { property: "og:description", content: "Free, evidence-based scam checks for screenshots and links. No account needed." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://thesecondlook.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/" }],
   }),
   component: Index,
 });
@@ -92,7 +95,7 @@ function Index() {
         <div className="flex flex-col gap-6">
           <p className="text-[17px] leading-relaxed">
             <span className="text-foreground">Upload a screenshot or paste a link.</span>{" "}
-            <span className="tone-grey">We examine the evidence and explain what we find, in plain language.</span>
+            <span className="tone-grey">Second Look is a free scam-detection tool for suspicious messages and links. We examine the evidence and explain what we find, in plain language.</span>
           </p>
           <SubmissionPanel />
         </div>
