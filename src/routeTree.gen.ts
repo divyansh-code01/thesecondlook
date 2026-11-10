@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CheckJobIdRouteImport } from './routes/check.$jobId'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
+import { Route as ApiPublicRefreshThreatsRouteImport } from './routes/api/public/refresh-threats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ReportIdRoute = ReportIdRouteImport.update({
   path: '/report/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRefreshThreatsRoute = ApiPublicRefreshThreatsRouteImport.update({
+  id: '/api/public/refresh-threats',
+  path: '/api/public/refresh-threats',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
+  '/api/public/refresh-threats': typeof ApiPublicRefreshThreatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
+  '/api/public/refresh-threats': typeof ApiPublicRefreshThreatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
+  '/api/public/refresh-threats': typeof ApiPublicRefreshThreatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
+    | '/api/public/refresh-threats'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
+    | '/api/public/refresh-threats'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
+    | '/api/public/refresh-threats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   CheckJobIdRoute: typeof CheckJobIdRoute
   ReportIdRoute: typeof ReportIdRoute
+  ApiPublicRefreshThreatsRoute: typeof ApiPublicRefreshThreatsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-threats': {
+      id: '/api/public/refresh-threats'
+      path: '/api/public/refresh-threats'
+      fullPath: '/api/public/refresh-threats'
+      preLoaderRoute: typeof ApiPublicRefreshThreatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   CheckJobIdRoute: CheckJobIdRoute,
   ReportIdRoute: ReportIdRoute,
+  ApiPublicRefreshThreatsRoute: ApiPublicRefreshThreatsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
