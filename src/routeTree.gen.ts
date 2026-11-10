@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CheckJobIdRouteImport } from './routes/check.$jobId'
 import { Route as ReportIdRouteImport } from './routes/report.$id'
@@ -30,6 +31,11 @@ const MethodologyRoute = MethodologyRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/methodology': typeof MethodologyRoute
   '/privacy': typeof PrivacyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/check/$jobId': typeof CheckJobIdRoute
   '/report/$id': typeof ReportIdRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/methodology'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/methodology'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/methodology'
     | '/privacy'
+    | '/sitemap.xml'
     | '/terms'
     | '/check/$jobId'
     | '/report/$id'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MethodologyRoute: typeof MethodologyRoute
   PrivacyRoute: typeof PrivacyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   CheckJobIdRoute: typeof CheckJobIdRoute
   ReportIdRoute: typeof ReportIdRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MethodologyRoute: MethodologyRoute,
   PrivacyRoute: PrivacyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   CheckJobIdRoute: CheckJobIdRoute,
   ReportIdRoute: ReportIdRoute,
