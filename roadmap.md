@@ -2,9 +2,12 @@
 
 ## Current request
 - [x] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
-- [ ] Priority 2: unknown-domain scoring and reliable parallel checks, core coverage, URL cache.
-- [ ] Priority 3: Quad9, scheduled threat lists, destination checks, screenshot rules, honesty text.
-- [ ] Run requested regression tests and live checks; report completed rules and blockers.
+- [x] Rule 2: unknown-domain points, age points, and minimum 50 for domain plus message warnings.
+- [x] Rule 4: parallel URL checks, shared 15-second budget, core coverage, ten-minute cache, caution fallback.
+- [x] Rule 3a/b/d/e: Cloudflare security DNS, Quad9, existing keyed feeds, URL heuristics and destination checks.
+- [ ] Rule 3c: six-hour refresh is configured and OpenPhish loaded; Phishing.Database import has not completed in the available request time. Partial list coverage remains unavailable with a reason.
+- [x] Rules 5/6: screenshot links and message rules, sender mismatch, honesty text.
+- [x] Tests: 58 passed; live phishing 85, Driver License screenshot 100, nonexistent domain 45, example.com 0.
 
 ## Original build reference
 

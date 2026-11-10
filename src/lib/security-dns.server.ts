@@ -10,7 +10,7 @@ export async function queryDns(endpoint: string, host: string, type = "A", signa
       const response = await fetchWithTimeout(`${endpoint}?name=${encodeURIComponent(host)}&type=${type}`, { signal, headers: { accept: "application/dns-json" } }, 8000);
       if (!response.ok) throw new Error("dns_service_unavailable");
       const data = await response.json() as DnsResponse;
-      if (typeof data.Status !== "number" || ![0, 3].includes(data.Status)) throw new Error("dns_lookup_failed");
+      if (typeof data.Status !== "number" || (!cloudflareBlocked(data) && ![0, 3].includes(data.Status))) throw new Error("dns_lookup_failed");
       return data;
     } catch (error) {
       if (attempt === 1) throw error;
