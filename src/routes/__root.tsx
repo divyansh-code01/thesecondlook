@@ -73,6 +73,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      // Google Search Console site ownership; must stay verbatim in <head>.
+      {
+        name: "google-site-verification",
+        content: "4WcTOcM8DjaPK0oEwoypVd9sI4z_IJTDXt_ZF1RzX8o",
+      },
       { title: "Second Look®" },
       { name: "description", content: "Before you trust it, check it. Upload a screenshot or paste a link." },
       { property: "og:title", content: "Second Look®" },
