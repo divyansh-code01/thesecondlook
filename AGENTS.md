@@ -16,3 +16,5 @@
 - Every outbound fetch from user input goes through `resolveAndGuard` (DoH + `src/shared/ip-guard.ts`), re-checked on each redirect hop. Why: SSRF defence.
 - Jobs/reports tables have no client policies; reads go through security-definer RPCs via server functions. Why: anonymous app with no direct table access.
 - Pipeline "edge functions" from the spec are TanStack server functions in `src/lib/*.functions.ts`. Why: platform uses server functions, not edge functions.
+- URL checks publish completed evidence independently under a shared 15-second cancellation budget, with a private hashed-URL cache; coverage is informational. Why: slow optional providers must not erase evidence or dead-end reports.
+- Scheduled phishing-list refresh uses a managed-authenticated TanStack public server route and private threat tables. Why: no API key or client table access is needed.

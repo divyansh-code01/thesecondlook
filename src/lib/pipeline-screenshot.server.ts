@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { SIGNALS } from "@/shared/signals.config";
 import { extractPaymentIdentifiers, extractRefs, isPromptInjectionAttempt, stripControlChars, truncate } from "@/shared/sanitize";
-import type { Check, Signal } from "@/shared/types";
+import type { Check, Signal, TechnicalDetails } from "@/shared/types";
 import { defangUrl } from "@/shared/types";
 import { AiUnavailableError, extractMessageSignals, runOcr, type OcrResult } from "./ai.server";
 import { buildReport } from "./report-build";
@@ -23,6 +23,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
   const tracker = await createStageTracker(admin, jobId);
   const checks: Check[] = [];
   const signals: Signal[] = [];
+  const technical: TechnicalDetails = { redirectChain: [], threatIntel: [], rawSignals: [], dns: null, rdap: null };
   let ocr: OcrResult | null = null;
 
   // Validate + OCR, always deleting the upload afterwards.
@@ -100,7 +101,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
   // Links
   await tracker.set("links", "running");
   const notes: string[] = [];
-  const candidates = refs.urls.slice(0, 5);
+  const candidates = refs.urls;
   const urls: string[] = [];
   for (const raw of candidates) {
     let host = "";
@@ -120,11 +121,11 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
     }
     urls.push(raw);
   }
-  if (refs.urls.length > 5) notes.push(`${refs.urls.length - 5} more links were found but not checked.`);
   if (urls.length === 0) {
     await tracker.set("links", "skipped");
   } else {
-    const results = await Promise.all(urls.map((u) => analyzeUrl(u).catch(() => null)));
+    const budget = AbortSignal.timeout(15000);
+    const results = await Promise.all(urls.map((u) => analyzeUrl(u, async () => {}, { signal: budget }).catch(() => null)));
     results.forEach((r, i) => {
       if (!r) {
         checks.push({ name: `Link check: ${defangUrl(urls[i])}`, status: "unavailable", source: "heuristic", note: "The link checks failed to run" });
@@ -136,10 +137,21 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
             ? `${r.defangedUrl} points to a private network and was not checked.`
             : `${r.defangedUrl}: Link looks incomplete or malformed and was not checked.`,
         );
+        for (const s of r.signals) signals.push({ ...s, found: `${r.defangedUrl}: ${s.found}` });
+        checks.push({ name: `Link check · ${r.defangedUrl}`, status: "unavailable", source: "dns", note: "Destination was blocked; no request was made to it" });
         return;
       }
       for (const s of r.signals) signals.push({ ...s, found: `${r.defangedUrl}: ${s.found}` });
       for (const c of r.checks) checks.push({ ...c, name: `${c.name} · ${r.defangedUrl}` });
+      technical.threatIntel.push(...r.technical.threatIntel);
+      technical.redirectChain.push(...r.hops);
+      // All links must meet the low-risk requirements, not just the first one.
+      const resolves = r.technical.dns?.records.some((d) => ["A", "AAAA"].includes(d.type));
+      const age = r.technical.rdap?.ageDays ?? 0;
+      if (!technical.rdap || age < (technical.rdap.ageDays ?? 0)) technical.rdap = { status: "combined", ageDays: age };
+      if (!technical.dns) technical.dns = { source: "Extracted link DNS", records: [] };
+      if (resolves) technical.dns.records.push(...(r.technical.dns?.records ?? []));
+      else technical.rdap = { status: "unverified", ageDays: 0 };
     });
     await tracker.set("links", "done");
   }
@@ -180,6 +192,7 @@ export async function runScreenshotPipeline(admin: SupabaseClient<Database>, job
     inputDisplay: `Screenshot${ocr.app_guess ? ` (${truncate(ocr.app_guess, 40)})` : ""}`,
     signals,
     checks,
+    technical,
     extra: {
       extractedText: text,
       ocrConfidence: ocr.ocr_confidence ?? null,

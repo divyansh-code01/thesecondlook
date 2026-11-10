@@ -13,7 +13,7 @@ export const GOV_CLAIM =
   /\b(department of|dept\.? of|dmv|secretary of state|irs|internal revenue|police|customs|tax (office|department|authority|refund)|hmrc|court|ministry of|government|federal|state of|office of the)\b/i;
 
 export const MESSAGE_RULES: Rule[] = [
-  { id: "impersonation_org", patterns: [GOV_CLAIM] },
+  { id: "impersonation_org", patterns: [GOV_CLAIM, /\b(bank|banking|chase|wells fargo|citibank|hdfc|icici|hsbc|barclays)\b/i] },
   {
     id: "urgency_pressure",
     patterns: [

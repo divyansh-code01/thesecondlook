@@ -197,10 +197,9 @@ export const runAnalysis = createServerFn({ method: "POST" })
         await runScreenshotPipeline(admin, data.jobId, input.uploadPath ?? "");
       }
     } catch (e) {
-      await admin
-        .from("jobs")
-        .update({ status: "error", error_code: "pipeline_failed", updated_at: new Date().toISOString() })
-        .eq("id", data.jobId);
+      const { fallbackReport } = await import("./report-build");
+      const { finishJob } = await import("./stages.server");
+      await finishJob(admin, data.jobId, fallbackReport(job.type === "url" ? "url" : "screenshot", "The analysis could not finish. Treat this submission with caution and try again."));
       // Log only job id and error code — never submitted text, URLs or images.
       console.error("pipeline_failed", { jobId: data.jobId, code: e instanceof Error ? e.name : "unknown" });
       return { error: "pipeline_failed" as const, message: "The analysis could not complete. Please try again." };
