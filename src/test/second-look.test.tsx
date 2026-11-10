@@ -51,9 +51,9 @@ describe("scoring rules", () => {
     expect(computeScore([sig("suspicious_tld"), sig("established_domain_allowlist", { status: "info" })]).score).toBe(5);
   });
 
-  it("shows insufficient evidence under 50% coverage without a confirmed hit", () => {
+  it("coverage never changes the score classification", () => {
     const r = computeScore([sig("suspicious_tld")]);
-    expect(effectiveClassification(r, 0.4).key).toBe("insufficient");
+    expect(effectiveClassification(r, 0.4).key).toBe("low");
     const hit = computeScore([sig("threat_feed_hit", { status: "confirmed" })]);
     expect(effectiveClassification(hit, 0.4).key).toBe("critical");
   });
