@@ -5,9 +5,9 @@ export const Route = createFileRoute("/terms")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Terms — Second Look®" },
-      { name: "description", content: "The plain-language terms for using Second Look." },
-      { property: "og:title", content: "Terms — Second Look®" },
+      { title: "Terms — The SecondLook" },
+      { name: "description", content: "The plain-language terms for using The SecondLook." },
+      { property: "og:title", content: "Terms — The SecondLook" },
       { property: "og:description", content: "An automated second opinion, not a guarantee." },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/terms" },
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/terms")({
   component: () => (
     <ProsePage label="TERMS" title="THE SHORT" grey="VERSION.">
       <h2>What this is</h2>
-      <p>Second Look is a free, automated tool that gives a second opinion on suspicious messages and links. Its results are an assessment based on the checks listed in each report — not a guarantee, and not legal, financial or security advice.</p>
+      <p>The SecondLook is a free, automated tool that gives a second opinion on suspicious messages and links. Its results are an assessment based on the checks listed in each report — not a guarantee, and not legal, financial or security advice.</p>
       <h2>Your responsibility</h2>
       <p>You decide what to do with a message. When in doubt, contact the organisation using details you find independently. Only submit content you're entitled to share.</p>
       <h2>Fair use</h2>

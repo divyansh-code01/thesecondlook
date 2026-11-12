@@ -66,7 +66,7 @@ export function ReportView({ report: originalReport, onSave, saveState, analyzeA
 
   function copySummary() {
     const lines = [
-      `Second Look report — ${label} (${report.score}/100)`,
+      `The SecondLook report — ${label} (${report.score}/100)`,
       `Input: ${report.inputDisplay}`,
       "",
       report.summary,

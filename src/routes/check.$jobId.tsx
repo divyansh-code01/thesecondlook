@@ -14,9 +14,9 @@ export const Route = createFileRoute("/check/$jobId")({
   staticData: { sitemap: false },
   head: () => ({
     meta: [
-      { title: "Checking… — Second Look®" },
-      { name: "description", content: "Your Second Look analysis is in progress." },
-      { property: "og:title", content: "Second Look® analysis" },
+      { title: "Checking… — The SecondLook" },
+      { name: "description", content: "Your The SecondLook analysis is in progress." },
+      { property: "og:title", content: "The SecondLook analysis" },
       { property: "og:description", content: "Evidence-based scam check in progress." },
       { name: "robots", content: "noindex" },
       { property: "og:type", content: "article" },

@@ -13,9 +13,9 @@ export const Route = createFileRoute("/report/$id")({
   validateSearch: (s) => z.object({ token: z.string().optional() }).parse(s),
   head: () => ({
     meta: [
-      { title: "Saved report — Second Look®" },
-      { name: "description", content: "A saved Second Look scam-check report. Expires after 30 days." },
-      { property: "og:title", content: "Second Look® saved report" },
+      { title: "Saved report — The SecondLook" },
+      { name: "description", content: "A saved The SecondLook scam-check report. Expires after 30 days." },
+      { property: "og:title", content: "The SecondLook saved report" },
       { property: "og:description", content: "An evidence-based scam-check report." },
       { name: "robots", content: "noindex" },
       { property: "og:type", content: "article" },

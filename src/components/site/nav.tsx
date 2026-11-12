@@ -6,10 +6,10 @@ export function Wordmark({ className = "" }: { className?: string }) {
   return (
     <Link
       to="/"
-      aria-label="Second Look — home"
+      aria-label="The SecondLook — home"
       className={`text-[15px] font-semibold uppercase tracking-[-0.01em] text-foreground ${className}`}
     >
-      Second Look<span aria-hidden className="align-super text-[9px]">®</span>
+      The SecondLook
     </Link>
   );
 }

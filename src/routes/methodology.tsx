@@ -6,9 +6,9 @@ export const Route = createFileRoute("/methodology")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Methodology — Second Look®" },
-      { name: "description", content: "How Second Look detects scams: detection layers, the full weight table, scoring rules and limits." },
-      { property: "og:title", content: "Methodology — Second Look®" },
+      { title: "Methodology — The SecondLook" },
+      { name: "description", content: "How The SecondLook detects scams: detection layers, the full weight table, scoring rules and limits." },
+      { property: "og:title", content: "Methodology — The SecondLook" },
       { property: "og:description", content: "Detection layers, weights and the honest limits of an automated scam check." },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/methodology" },
@@ -23,7 +23,7 @@ function Methodology() {
   const rows = Object.entries(SIGNALS);
   return (
     <ProsePage label="METHODOLOGY" title="HOW WE" grey="LOOK TWICE.">
-      <p>Second Look turns a screenshot or link into a list of typed findings. A fixed, deterministic formula turns those findings into a score. AI is used only to read text and to tag message wording from a fixed list — it never sets the score.</p>
+      <p>The SecondLook turns a screenshot or link into a list of typed findings. A fixed, deterministic formula turns those findings into a score. AI is used only to read text and to tag message wording from a fixed list — it never sets the score.</p>
       <h2>Detection layers</h2>
       <ul>
         <li>Link: threat-intelligence feeds (when configured), lookalike brands, shorteners, safe server-side redirect following, address patterns.</li>

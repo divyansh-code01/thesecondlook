@@ -5,9 +5,9 @@ export const Route = createFileRoute("/privacy")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Privacy — Second Look®" },
-      { name: "description", content: "Exactly what Second Look processes, what it keeps, and for how long." },
-      { property: "og:title", content: "Privacy — Second Look®" },
+      { title: "Privacy — The SecondLook" },
+      { name: "description", content: "Exactly what The SecondLook processes, what it keeps, and for how long." },
+      { property: "og:title", content: "Privacy — The SecondLook" },
       { property: "og:description", content: "Screenshots deleted after text extraction. Nothing stored unless you save a report." },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/privacy" },

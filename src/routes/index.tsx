@@ -10,15 +10,28 @@ export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
     meta: [
-      { title: "Second Look® — Before you trust it, check it." },
-      { name: "description", content: "Upload a screenshot or paste a suspicious link. Second Look examines the evidence and explains what it finds, in plain language." },
-      { property: "og:title", content: "Second Look® — Before you trust it, check it." },
-      { property: "og:description", content: "Free, evidence-based scam checks for screenshots and links. No account needed." },
+      { title: "The SecondLook | AI-Powered Scam & Phishing Detection" },
+      { name: "description", content: "The SecondLook helps you identify suspicious messages and links. Upload a screenshot or paste a link to get a free, evidence-based scam check in plain language." },
+      { property: "og:title", content: "The SecondLook | AI-Powered Scam & Phishing Detection" },
+      { property: "og:description", content: "The SecondLook helps you identify suspicious messages and links. Before you trust it, check it." },
+      { property: "og:site_name", content: "The SecondLook" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "The SecondLook",
+          url: "https://thesecondlook.lovable.app/",
+          description: "The SecondLook helps you identify suspicious messages and links.",
+        }),
+      },
+    ],
   }),
   component: Index,
 });
@@ -51,14 +64,14 @@ const PRINCIPLES = [
 ];
 
 const FAQ = [
-  ["What does Second Look check?", "Links (threat-intelligence feeds, lookalike domains, redirects, link patterns), domains (registration age, DNS, certificate history), and message wording (pressure, requests for codes or money, impersonation)."],
+  ["What does The SecondLook check?", "Links (threat-intelligence feeds, lookalike domains, redirects, link patterns), domains (registration age, DNS, certificate history), and message wording (pressure, requests for codes or money, impersonation)."],
   ["How accurate is it?", "It's an evidence-based assessment, not a verdict. New scams appear every day, and some checks may be unavailable. Treat the result as a second opinion, not a guarantee."],
   ["What happens to my data?", "Screenshots are deleted as soon as the text is extracted. Nothing is stored unless you choose to save a report, which keeps only the findings — never the screenshot — for 30 days."],
   ["Do you open the links I submit?", "Never in your browser. Our server looks up public records and follows redirects using lightweight requests, without loading the page's content. Private and internal network addresses are blocked."],
   ["Why isn't “low risk” the same as “safe”?", "A low score means the checks we could run didn't find major warning signs. A brand-new scam might not be listed anywhere yet, so always verify independently."],
   ["Which files can I upload?", "PNG, JPG or WebP screenshots, up to 8 MB and 8000×8000 pixels. PDFs and other formats aren't supported."],
   ["I already clicked or shared something. What now?", "Change the passwords for any account involved, contact your bank if you shared payment details, and report the message to your national cybercrime service."],
-  ["Who built this?", "Second Look is an independent tool built to give people a calm, honest second opinion before they act on a suspicious message."],
+  ["Who built this?", "The SecondLook is an independent tool built to give people a calm, honest second opinion before they act on a suspicious message."],
 ];
 
 const BAR = (Object.entries(CATEGORY_CAPS) as [keyof typeof CATEGORY_CAPS, number][]).map(([k, v]) => ({
@@ -86,6 +99,7 @@ function Index() {
       {/* Hero */}
       <section className="grid gap-10 pt-14 pb-12 md:grid-cols-2 md:pt-20">
         <h1 className="heading-display text-[clamp(40px,6vw,88px)]">
+          <span className="micro-label mb-5 block">THE SECONDLOOK</span>
           BEFORE YOU
           <br />
           TRUST IT,
@@ -95,7 +109,7 @@ function Index() {
         <div className="flex flex-col gap-6">
           <p className="text-[17px] leading-relaxed">
             <span className="text-foreground">Upload a screenshot or paste a link.</span>{" "}
-            <span className="tone-grey">Second Look is a free scam-detection tool for suspicious messages and links. We examine the evidence and explain what we find, in plain language.</span>
+            <span className="tone-grey">The SecondLook is a free scam-detection tool for suspicious messages and links. We examine the evidence and explain what we find, in plain language.</span>
           </p>
           <SubmissionPanel />
         </div>

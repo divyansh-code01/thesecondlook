@@ -69,16 +69,16 @@ export function SiteFooter() {
         <p
           aria-hidden
           className="select-none whitespace-nowrap font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-foreground"
-          style={{ fontSize: "clamp(44px, 9.6vw, 132px)" }}
+          style={{ fontSize: "clamp(38px, 8.2vw, 113px)" }}
         >
-          Second Look<span className="align-super" style={{ fontSize: "0.35em" }}>®</span>
+          The SecondLook
         </p>
         <div className="mt-2 flex items-center justify-between">
-          <p className="micro-label">© {new Date().getFullYear()} Second Look</p>
+          <p className="micro-label">© {new Date().getFullYear()} The SecondLook</p>
           <p className="micro-label">Not a guarantee — a second look.</p>
         </div>
         <p className="mt-4 text-[13px] text-grey-mid">
-          Second Look is an early version. Treat results as guidance, not a guarantee.
+          The SecondLook is an early version. Treat results as guidance, not a guarantee.
         </p>
       </div>
     </footer>
