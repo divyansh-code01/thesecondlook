@@ -174,11 +174,11 @@
   color: var(--color-grey-mid);
 }
 
-/* White editorial container on the grey page frame */
+/* Full-width editorial container with shared internal spacing. */
 @utility site-container {
-  margin-inline: auto;
-  width: 92%;
-  max-width: 1480px;
+  margin-inline: 0;
+  width: 100vw;
+  max-width: none;
   background: var(--color-surface);
   padding-inline: clamp(20px, 4vw, 64px);
 }
@@ -196,7 +196,6 @@
 
 @media (max-width: 639px) {
   .site-container {
-    width: 100%;
     padding-inline: 20px;
   }
 }
