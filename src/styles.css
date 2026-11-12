@@ -177,25 +177,38 @@
 /* White editorial container on the grey page frame */
 @utility site-container {
   margin-inline: auto;
-  width: 100%;
-  max-width: 1240px;
+  width: 92%;
+  max-width: 1480px;
   background: var(--color-surface);
-  padding-inline: 64px;
+  padding-inline: clamp(20px, 4vw, 64px);
 }
 
-@media (max-width: 1023px) {
-  .site-container {
-    padding-inline: 32px;
+/* Balanced columns expand with the shared shell; the upload stays usable. */
+@utility submission-layout {
+  display: grid;
+  gap: 40px;
+  min-width: 0;
+  @media (min-width: 768px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(32px, 4vw, 64px);
   }
 }
 
 @media (max-width: 639px) {
   .site-container {
+    width: 100%;
     padding-inline: 20px;
   }
 }
 
 /* ---------- Buttons ---------- */
+
+@utility footer-wordmark {
+  font-size: clamp(38px, 8.2vw, 113px);
+  @media (max-width: 359px) {
+    font-size: 33px;
+  }
+}
 
 @utility btn-pill {
   display: inline-flex;

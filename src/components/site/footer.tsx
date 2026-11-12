@@ -42,7 +42,7 @@ export function SiteFooter() {
 
       <div className="mt-14 grid grid-cols-2 gap-8 sm:grid-cols-3">
         {COLUMNS.map((col) => (
-          <nav key={col.title} aria-label={col.title} className="flex flex-col items-start gap-2.5">
+          <nav key={col.title} aria-label={col.title} className="flex min-w-0 flex-col items-start gap-2.5">
             <p className="micro-label">{col.title}</p>
             {col.items.map((item) =>
               "to" in item ? (
@@ -68,12 +68,11 @@ export function SiteFooter() {
       <div className="mt-16 pb-8">
         <p
           aria-hidden
-          className="select-none whitespace-nowrap font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-foreground"
-          style={{ fontSize: "clamp(38px, 8.2vw, 113px)" }}
+          className="footer-wordmark select-none whitespace-nowrap font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-foreground"
         >
           The SecondLook
         </p>
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 grid gap-2 sm:flex sm:items-center sm:justify-between">
           <p className="micro-label">© {new Date().getFullYear()} The SecondLook</p>
           <p className="micro-label">Not a guarantee — a second look.</p>
         </div>
