@@ -385,7 +385,7 @@ export function SubmissionPanel() {
         <div id="panel-screenshot" role="tabpanel" aria-labelledby="tab-screenshot" className="pt-5">
           {!file ? (
             <div
-              className={`dropzone flex flex-col items-center justify-center gap-3 px-6 py-12 text-center ${dragOver ? "is-dragover" : ""}`}
+              className={`dropzone flex flex-col items-center justify-center gap-3 px-6 py-12 md:py-16 lg:py-20 text-center ${dragOver ? "is-dragover" : ""}`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setDragOver(true);

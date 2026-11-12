@@ -97,7 +97,7 @@ function Index() {
   return (
     <main id="main">
       {/* Hero */}
-      <section className="submission-layout pt-14 pb-12 md:pt-20">
+      <section className="submission-layout pt-14 pb-12 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:pt-20">
         <h1 className="heading-display min-w-0 text-[clamp(40px,6vw,88px)]">
           <span className="micro-label mb-5 block">THE SECONDLOOK</span>
           BEFORE YOU
@@ -106,8 +106,8 @@ function Index() {
           <br />
           <span className="tone-grey">CHECK IT.</span>
         </h1>
-        <div className="flex w-full min-w-0 max-w-[640px] flex-col gap-6 md:justify-self-end">
-          <p className="text-[17px] leading-relaxed">
+        <div className="flex w-full min-w-0 flex-col gap-8 md:self-center">
+          <p className="text-[clamp(17px,1.25vw,20px)] leading-relaxed">
             <span className="text-foreground">Upload a screenshot or paste a link.</span>{" "}
             <span className="tone-grey">The SecondLook is a free scam-detection tool for suspicious messages and links. We examine the evidence and explain what we find, in plain language.</span>
           </p>
