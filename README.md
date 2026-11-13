@@ -1,39 +1,66 @@
-# Welcome to your Lovable project
+# The SecondLook
 
-This project was built with [Lovable](https://lovable.dev).
+**Before you trust it, check it.**
 
-## Build with Lovable
+[![Live Website](https://img.shields.io/badge/Website-Live-386c94?style=flat-square)](https://thesecondlook.lovable.app/)
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+The SecondLook is a free, AI-powered scam detection tool designed to help people identify potentially fraudulent messages and suspicious links before interacting with them.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+Online scams are becoming increasingly convincing. From fake delivery notifications and payment requests to phishing messages impersonating trusted organisations, it can be difficult to distinguish legitimate communication from potential threats.
 
-## Development
+The SecondLook aims to make that process easier by turning suspicious messages and links into understandable risk assessments.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Live Website
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+**[https://thesecondlook.lovable.app/](https://thesecondlook.lovable.app/)**
 
-## Built with
+## Features
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+- **Screenshot Analysis:** Upload a screenshot of a suspicious message for analysis.
+- **Link Analysis:** Submit a URL to check for potential phishing and scam indicators.
+- **Risk Assessment:** Receive an assessment of the potential risk associated with the submitted content.
+- **Explanations:** Understand the indicators that may make a message or link suspicious through plain-language explanations.
+- **Suggested Next Steps:** Get practical recommendations on how to proceed safely.
 
-## Second Look® — optional threat-intelligence keys
+## How It Works
 
-All checks that need no key (link heuristics, DNS, domain registration, certificate history, AI text reading) run out of the box. Add these secrets to unlock more checks; until then each shows as UNAVAILABLE in reports:
+The SecondLook provides two ways to analyse potentially suspicious content:
 
-- `SAFE_BROWSING_API_KEY` — Google Safe Browsing lookups
-- `URLHAUS_AUTH_KEY` — URLhaus malicious-URL database
-- `PHISHTANK_API_KEY` — PhishTank (optional)
-- `VIRUSTOTAL_API_KEY` — VirusTotal domain reputation (optional)
-- `RATE_LIMIT_SALT` — optional custom salt for hashed network addresses
+1. **Submit:** Upload a screenshot of a suspicious message or paste a potentially unsafe link.
+2. **Analyse:** The system examines the submitted content for potential scam and phishing indicators.
+3. **Understand:** Review the risk assessment and the reasons behind the identified indicators.
+4. **Act:** Use the suggested next steps to make a more informed decision.
+
+## Why The SecondLook?
+
+Many people encounter suspicious messages but lack the technical knowledge or confidence to evaluate them.
+
+The SecondLook explores how artificial intelligence can make cybersecurity awareness more accessible by translating potentially complex warning signs into information that everyday users can understand.
+
+The objective is simple: make it easier to pause, question and verify before trusting something online.
+
+## Important Disclaimer
+
+The SecondLook is an informational scam-detection tool, not a guarantee of security.
+
+- A low-risk assessment does not guarantee that a message or link is legitimate.
+- A high-risk assessment does not independently prove malicious intent.
+- Users should independently verify unexpected requests involving money, credentials or personal information.
+- Avoid submitting passwords, financial details or other sensitive personal information.
+
+Always exercise caution when interacting with unfamiliar messages and links.
+
+## Project Status
+
+The SecondLook is an evolving project. Its features, analysis capabilities and user experience may continue to improve over time.
+
+Feedback, suggestions and constructive criticism are welcome.
+
+## Connect
+
+- **Website:** https://thesecondlook.lovable.app/
+- **Project:** The SecondLook
+
+---
+
+*The SecondLook — Before you trust it, check it.*
