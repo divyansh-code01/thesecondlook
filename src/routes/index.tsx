@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "The SecondLook",
+          alternateName: "The SecondLook Scam Detection",
           url: "https://thesecondlook.lovable.app/",
           description: "The SecondLook helps you identify suspicious messages and links.",
         }),
