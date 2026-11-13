@@ -1,6 +1,8 @@
 # Second Look® — analysis fixes
 
 ## Current request
+- [ ] SEO expansion: four practical guides, relevant homepage wording, descriptive public-page headings and internal links.
+- [ ] SEO expansion verification: eight public sitemap entries, private-page exclusions, structured data, desktop/mobile checks and performance observations.
 - [x] Widen the shared page layout and rebalance the homepage columns; verified 320–1920px alignment and upload tabs, plus public pages at desktop/mobile sizes; 40 existing tests passed.
 - [x] SEO: router-derived sitemap for public pages, crawler discovery, self-canonicals, and crawlable homepage description.
 - [x] SEO: preview XML and homepage verified; three sitemap/routing tests pass; live readiness checked.
