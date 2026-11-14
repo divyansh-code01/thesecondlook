@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProsePage } from "@/components/site/prose-page";
+import { GuideLinks } from "@/components/site/scam-guide";
 import { AI_SIGNAL_CAP, CATEGORY_CAPS, SIGNALS, THREAT_FEED_FLOOR } from "@/shared/signals.config";
 
 export const Route = createFileRoute("/methodology")({
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/methodology")({
       { name: "description", content: "How The SecondLook detects scams: detection layers, the full weight table, scoring rules and limits." },
       { property: "og:title", content: "Methodology — The SecondLook" },
       { property: "og:description", content: "Detection layers, weights and the honest limits of an automated scam check." },
-      { property: "og:type", content: "article" },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/methodology" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/methodology")({
 function Methodology() {
   const rows = Object.entries(SIGNALS);
   return (
-    <ProsePage label="METHODOLOGY" title="HOW WE" grey="LOOK TWICE.">
+    <ProsePage label="METHODOLOGY" title="HOW SCAM" grey="DETECTION WORKS.">
       <p>The SecondLook turns a screenshot or link into a list of typed findings. A fixed, deterministic formula turns those findings into a score. AI is used only to read text and to tag message wording from a fixed list — it never sets the score.</p>
       <h2>Detection layers</h2>
       <ul>
@@ -62,6 +63,9 @@ function Methodology() {
         <li>A valid HTTPS certificate doesn't make a site trustworthy, and a new domain isn't automatically malicious.</li>
         <li>Text extraction can miss details in blurry or cropped screenshots.</li>
       </ul>
+      <h2>Apply the evidence</h2>
+      <p>Use these guides to interpret a suspicious message or link and verify its claims independently.</p>
+      <GuideLinks />
     </ProsePage>
   );
 }

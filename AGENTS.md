@@ -19,4 +19,5 @@
 - URL checks publish completed evidence independently under a shared 15-second cancellation budget, with a private hashed-URL cache; coverage is informational. Why: slow optional providers must not erase evidence or dead-end reports.
 - Scheduled phishing-list refresh uses a managed-authenticated TanStack public server route and private threat tables. Why: no API key or client table access is needed.
 - Sitemap entries derive from required route-level sitemap decisions; private reports, checks, and API endpoints are excluded. Why: public page discovery stays synchronized with routing without exposing submissions.
+- Educational guides use dedicated public routes and a shared browser-safe editorial module with route-specific metadata. Why: articles remain crawlable without new server logic or duplicate brand schema.
 - Use the shared site-container for page, navigation and footer alignment, with balanced minmax submission columns and a bounded upload area. Why: wider screens gain usable content space while narrow screens avoid overflow.

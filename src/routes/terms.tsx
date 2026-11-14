@@ -9,14 +9,14 @@ export const Route = createFileRoute("/terms")({
       { name: "description", content: "The plain-language terms for using The SecondLook." },
       { property: "og:title", content: "Terms — The SecondLook" },
       { property: "og:description", content: "An automated second opinion, not a guarantee." },
-      { property: "og:type", content: "article" },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/terms" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/terms" }],
   }),
   component: () => (
-    <ProsePage label="TERMS" title="THE SHORT" grey="VERSION.">
+    <ProsePage label="TERMS" title="TERMS" grey="OF USE.">
       <h2>What this is</h2>
       <p>The SecondLook is a free, automated tool that gives a second opinion on suspicious messages and links. Its results are an assessment based on the checks listed in each report — not a guarantee, and not legal, financial or security advice.</p>
       <h2>Your responsibility</h2>

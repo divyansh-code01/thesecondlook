@@ -7,6 +7,10 @@ const COLUMNS = [
       { label: "Home", to: "/" },
       { label: "How it works", to: "/#process" },
       { label: "Methodology", to: "/methodology" },
+      { label: "Identify online scams", to: "/how-to-identify-online-scams" },
+      { label: "Check suspicious links", to: "/how-to-check-suspicious-links" },
+      { label: "Phishing vs. smishing", to: "/phishing-vs-smishing" },
+      { label: "Scam warning signs", to: "/online-scam-warning-signs" },
     ],
   },
   {

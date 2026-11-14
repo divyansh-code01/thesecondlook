@@ -1,12 +1,12 @@
 # Second Look® — analysis fixes
 
 ## Current request
-- [ ] SEO expansion: four practical guides, relevant homepage wording, descriptive public-page headings and internal links.
-- [ ] SEO expansion verification: eight public sitemap entries, private-page exclusions, structured data, desktop/mobile checks and performance observations.
+- [x] SEO expansion: four practical guides, relevant homepage wording, descriptive public-page headings and internal links.
+- [x] SEO expansion verification: eight public sitemap entries, private-page exclusions and single brand schema verified in server HTML; 60 tests pass; guide-to-submission navigation and all eight pages checked at 1280px, 375px and 320px with no overflow or browser errors. Local development observations: LCP 468ms, CLS 0.00059; field Core Web Vitals remain unverified.
 - [x] Widen the shared page layout and rebalance the homepage columns; verified 320–1920px alignment and upload tabs, plus public pages at desktop/mobile sizes; 40 existing tests passed.
 - [x] SEO: router-derived sitemap for public pages, crawler discovery, self-canonicals, and crawlable homepage description.
 - [x] SEO: preview XML and homepage verified; three sitemap/routing tests pass; live readiness checked.
-- [ ] SEO publication: awaiting publishing; live /sitemap.xml currently returns 404, so submission is not ready yet.
+- [ ] SEO publication: current live sitemap works with four pages; publishing is required for the four new guides, updated wording and alternate-name schema. Search Console submission and field performance checks require direct access not available here.
 - [x] Priority 1: actionable verdicts, caution fallback, scanner links, Cloudflare security DNS.
 - [x] Rule 2: unknown-domain points, age points, and minimum 50 for domain plus message warnings.
 - [x] Rule 4: parallel URL checks, shared 15-second budget, core coverage, ten-minute cache, caution fallback.

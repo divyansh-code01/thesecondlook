@@ -9,14 +9,14 @@ export const Route = createFileRoute("/privacy")({
       { name: "description", content: "Exactly what The SecondLook processes, what it keeps, and for how long." },
       { property: "og:title", content: "Privacy — The SecondLook" },
       { property: "og:description", content: "Screenshots deleted after text extraction. Nothing stored unless you save a report." },
-      { property: "og:type", content: "article" },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/privacy" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://thesecondlook.lovable.app/privacy" }],
   }),
   component: () => (
-    <ProsePage label="PRIVACY" title="WHAT WE KEEP." grey="(ALMOST NOTHING.)">
+    <ProsePage label="PRIVACY" title="PRIVACY AND" grey="DATA HANDLING.">
       <h2>Screenshots</h2>
       <p>Your screenshot is re-encoded in your browser (which strips photo metadata), uploaded to a short-lived private storage area, read once to extract its text, and deleted immediately afterwards — whatever the outcome. A background job removes anything older than 15 minutes as a backstop. Screenshots are never used to train models.</p>
       <h2>Links and extracted text</h2>

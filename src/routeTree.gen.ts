@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HowToCheckSuspiciousLinksRouteImport } from './routes/how-to-check-suspicious-links'
+import { Route as HowToIdentifyOnlineScamsRouteImport } from './routes/how-to-identify-online-scams'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as OnlineScamWarningSignsRouteImport } from './routes/online-scam-warning-signs'
+import { Route as PhishingVsSmishingRouteImport } from './routes/phishing-vs-smishing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -23,9 +27,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowToCheckSuspiciousLinksRoute =
+  HowToCheckSuspiciousLinksRouteImport.update({
+    id: '/how-to-check-suspicious-links',
+    path: '/how-to-check-suspicious-links',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const HowToIdentifyOnlineScamsRoute =
+  HowToIdentifyOnlineScamsRouteImport.update({
+    id: '/how-to-identify-online-scams',
+    path: '/how-to-identify-online-scams',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnlineScamWarningSignsRoute = OnlineScamWarningSignsRouteImport.update({
+  id: '/online-scam-warning-signs',
+  path: '/online-scam-warning-signs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhishingVsSmishingRoute = PhishingVsSmishingRouteImport.update({
+  id: '/phishing-vs-smishing',
+  path: '/phishing-vs-smishing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -61,7 +87,11 @@ const ApiPublicRefreshThreatsRoute = ApiPublicRefreshThreatsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/how-to-check-suspicious-links': typeof HowToCheckSuspiciousLinksRoute
+  '/how-to-identify-online-scams': typeof HowToIdentifyOnlineScamsRoute
   '/methodology': typeof MethodologyRoute
+  '/online-scam-warning-signs': typeof OnlineScamWarningSignsRoute
+  '/phishing-vs-smishing': typeof PhishingVsSmishingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -71,7 +101,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/how-to-check-suspicious-links': typeof HowToCheckSuspiciousLinksRoute
+  '/how-to-identify-online-scams': typeof HowToIdentifyOnlineScamsRoute
   '/methodology': typeof MethodologyRoute
+  '/online-scam-warning-signs': typeof OnlineScamWarningSignsRoute
+  '/phishing-vs-smishing': typeof PhishingVsSmishingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -82,7 +116,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/how-to-check-suspicious-links': typeof HowToCheckSuspiciousLinksRoute
+  '/how-to-identify-online-scams': typeof HowToIdentifyOnlineScamsRoute
   '/methodology': typeof MethodologyRoute
+  '/online-scam-warning-signs': typeof OnlineScamWarningSignsRoute
+  '/phishing-vs-smishing': typeof PhishingVsSmishingRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -94,7 +132,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/how-to-check-suspicious-links'
+    | '/how-to-identify-online-scams'
     | '/methodology'
+    | '/online-scam-warning-signs'
+    | '/phishing-vs-smishing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -104,7 +146,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/how-to-check-suspicious-links'
+    | '/how-to-identify-online-scams'
     | '/methodology'
+    | '/online-scam-warning-signs'
+    | '/phishing-vs-smishing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -114,7 +160,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/how-to-check-suspicious-links'
+    | '/how-to-identify-online-scams'
     | '/methodology'
+    | '/online-scam-warning-signs'
+    | '/phishing-vs-smishing'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -125,7 +175,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HowToCheckSuspiciousLinksRoute: typeof HowToCheckSuspiciousLinksRoute
+  HowToIdentifyOnlineScamsRoute: typeof HowToIdentifyOnlineScamsRoute
   MethodologyRoute: typeof MethodologyRoute
+  OnlineScamWarningSignsRoute: typeof OnlineScamWarningSignsRoute
+  PhishingVsSmishingRoute: typeof PhishingVsSmishingRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -143,11 +197,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-to-check-suspicious-links': {
+      id: '/how-to-check-suspicious-links'
+      path: '/how-to-check-suspicious-links'
+      fullPath: '/how-to-check-suspicious-links'
+      preLoaderRoute: typeof HowToCheckSuspiciousLinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-to-identify-online-scams': {
+      id: '/how-to-identify-online-scams'
+      path: '/how-to-identify-online-scams'
+      fullPath: '/how-to-identify-online-scams'
+      preLoaderRoute: typeof HowToIdentifyOnlineScamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/methodology': {
       id: '/methodology'
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/online-scam-warning-signs': {
+      id: '/online-scam-warning-signs'
+      path: '/online-scam-warning-signs'
+      fullPath: '/online-scam-warning-signs'
+      preLoaderRoute: typeof OnlineScamWarningSignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/phishing-vs-smishing': {
+      id: '/phishing-vs-smishing'
+      path: '/phishing-vs-smishing'
+      fullPath: '/phishing-vs-smishing'
+      preLoaderRoute: typeof PhishingVsSmishingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -197,7 +279,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HowToCheckSuspiciousLinksRoute: HowToCheckSuspiciousLinksRoute,
+  HowToIdentifyOnlineScamsRoute: HowToIdentifyOnlineScamsRoute,
   MethodologyRoute: MethodologyRoute,
+  OnlineScamWarningSignsRoute: OnlineScamWarningSignsRoute,
+  PhishingVsSmishingRoute: PhishingVsSmishingRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,

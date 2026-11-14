@@ -5,9 +5,9 @@ import { routeTree } from "@/routeTree.gen";
 import { sitemapStaticPaths, sitemapXML } from "@/lib/sitemap";
 
 describe("public sitemap", () => {
-  it("includes exactly the four public pages and excludes submissions and API endpoints", () => {
+  it("includes exactly the eight public pages and excludes submissions and API endpoints", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
-    expect(sitemapStaticPaths(router)).toEqual(["/", "/methodology", "/privacy", "/terms"]);
+    expect(sitemapStaticPaths(router)).toEqual(["/", "/how-to-check-suspicious-links", "/how-to-identify-online-scams", "/methodology", "/online-scam-warning-signs", "/phishing-vs-smishing", "/privacy", "/terms"]);
   });
   it("uses canonical HTTPS URLs with no duplicate entries or invented modification dates", () => {
     const xml = sitemapXML("https://thesecondlook.lovable.app", [{ path: "/" }, { path: "/" }, { path: "/methodology" }]);

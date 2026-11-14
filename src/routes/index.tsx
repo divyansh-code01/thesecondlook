@@ -4,6 +4,7 @@ import { Clipboard, Code2, Download, Eye, Globe, Link2, MessageSquareText, ScanT
 
 import { SubmissionPanel } from "@/components/site/submission-panel";
 import { DarkCta } from "@/components/site/dark-cta";
+import { GuideLinks } from "@/components/site/scam-guide";
 import { CATEGORY_CAPS } from "@/shared/signals.config";
 
 export const Route = createFileRoute("/")({
@@ -11,9 +12,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "The SecondLook | AI-Powered Scam & Phishing Detection" },
-      { name: "description", content: "The SecondLook helps you identify suspicious messages and links. Upload a screenshot or paste a link to get a free, evidence-based scam check in plain language." },
+      { name: "description", content: "The SecondLook helps you check suspicious links and messages for scam and phishing warning signs. Upload a screenshot or paste a link for a free, evidence-based check." },
       { property: "og:title", content: "The SecondLook | AI-Powered Scam & Phishing Detection" },
-      { property: "og:description", content: "The SecondLook helps you identify suspicious messages and links. Before you trust it, check it." },
+      { property: "og:description", content: "The SecondLook checks suspicious messages and links for scam and phishing warning signs. Before you trust it, check it." },
       { property: "og:site_name", content: "The SecondLook" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://thesecondlook.lovable.app/" },
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/")({
           name: "The SecondLook",
           alternateName: "The SecondLook Scam Detection",
           url: "https://thesecondlook.lovable.app/",
-          description: "The SecondLook helps you identify suspicious messages and links.",
+          description: "The SecondLook is a free scam-detection tool for suspicious messages and links, with evidence-based phishing checks.",
         }),
       },
     ],
@@ -110,7 +111,7 @@ function Index() {
         <div className="flex w-full min-w-0 flex-col gap-8 md:self-center">
           <p className="text-[clamp(17px,1.25vw,20px)] leading-relaxed">
             <span className="text-foreground">Upload a screenshot or paste a link.</span>{" "}
-            <span className="tone-grey">The SecondLook is a free scam-detection tool for suspicious messages and links. We examine the evidence and explain what we find, in plain language.</span>
+            <span className="tone-grey">The SecondLook is a free scam-detection tool for suspicious messages and links. We check for scam and phishing warning signs and explain the evidence in plain language.</span>
           </p>
           <SubmissionPanel />
         </div>
@@ -184,6 +185,7 @@ function Index() {
             ))}
           </div>
           <Link to="/methodology" className="link-arrow mt-6">Read the full methodology →</Link>
+          <div className="mt-6"><GuideLinks /></div>
         </div>
       </section>
 
